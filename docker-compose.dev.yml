@@ -1,0 +1,11 @@
+version: "2"
+services:
+  shared-server:
+    volumes:
+     - './shared-server/service/:/app/service'
+  postgres:
+    volumes:
+    - ./postgres-sql/pgdata:/var/lib/postgresql/data
+volumes:
+    pgdata: {}
+

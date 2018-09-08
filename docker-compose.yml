@@ -1,0 +1,25 @@
+version: "2"
+services:
+  shared-server:
+    depends_on:
+    - postgres
+    build: ./shared-server
+    ports:
+    - "8080:8080"
+    container_name: sharedServer_container
+    environment:
+      - PGPASSWORD=postgres
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGPORT=5432
+    restart: always
+    links:
+    - postgres
+  postgres:
+    build: ./postgres-sql
+    container_name: pg_container
+    ports:
+    - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres

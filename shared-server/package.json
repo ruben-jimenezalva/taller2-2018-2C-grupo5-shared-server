@@ -1,0 +1,15 @@
+{
+  "name": "shared-server",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "author": "Paulo Cunero <paulocuneo@gmail.com>",
+  "main": "service/server.js",
+  "scripts": {
+    "prestart": "nodemon -L app/bin/www",
+    "start": "node service/server.js"
+  },
+  "dependencies": {
+    "express": "^4.16.1",
+    "pg": "^6.2.2"
+  }
+}
