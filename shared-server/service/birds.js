@@ -1,6 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../service/queries.js');
+var bodyParser = require('body-parser');
+
+//start body-parser configuration
+router.use(bodyParser.json() );       // to support JSON-encoded bodies
+router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+}));
+
 
 //User
 router.post('/token',db.createToken);

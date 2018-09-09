@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "express": "^4.16.1",
-    "pg": "^6.2.2"
+    "pg": "^6.2.2",
+    "body-parser": "^1.18.3",
+    "morgan": "^1.2.2"
   }
 }

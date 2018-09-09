@@ -16,7 +16,6 @@ function createToken (req, res, next){
 }
 
 function getAllServers (req, res, next){
-
   var client = new Client();
   client.connect((err) => {
     if (err) {
@@ -43,26 +42,76 @@ function createServer (req, res, next){
   })
 
   const text = 'INSERT INTO Servers(createdBy, nameServer) VALUES($1, $2) RETURNING *';
-  const values = ['brianc', 'sasd'];
+  var createdBy = req.body.createdBy || '';
+  var name = req.body.name || '';
+
+  if(createdBy == '' || name == ''){
+    return res.json({code: 400, data: 'Incumplimiento de precondiciones (parámetros faltantes)'});
+  }
+
+  const values = [createdBy,name];
+  //res.json({code: 201, data: req.body.createdBy, data2: req.body.name})
   client.query(text, values, (err, resp) => {
     if (err) {
       res.json({code: 500, data: err.message});
     } else {
-      res.json({code: 200, data: resp.rows});
+      res.json({code: 201, data: resp.rows});
     }
   })
 }
 
 function getSingleServer (req, res, next){
-  res.send('getSingleServer\n');
+  var client = new Client();
+  client.connect((err) => {
+    if (err) {
+      res.json({code: 500, data: err.message});
+    }
+  })
+
+  const text = 'SELECT * FROM Servers WHERE server_id=$1';
+  
+  client.query(text, [req.params.id], (err, resp) => {
+    if (err) {
+      res.json({code: 500, data: err.message});
+    } else {
+      if(resp.rows == ''){
+        res.json({code: 404, data:'Servidor inexistente'});
+      }else{
+        res.json({code: 200, data: resp.rows});
+      }
+    }
+  })
 }
 
 function updateServer (req, res, next){
   res.send('updateServer\n');
 }
 
+
 function removeServer (req, res, next){
-  res.send('removeServer\n');
+  var client = new Client();
+  client.connect((err) => {
+    if (err) {
+      res.json({code: 500, data: err.message});
+    }
+  })
+
+  const text = 'DELETE FROM Servers WHERE server_id=$1';
+  
+
+
+  //falta corregir
+  client.query(text, [req.params.id], (err, resp) => {
+    if (err) {
+      res.json({code: 500, data: err.message});
+    } else {
+      if(resp.count == '0'){
+        res.json({code: resp.count, data:'No existe el recurso solicitado'});
+      }else{
+        res.json({code: resp.count, data: 'Baja correcta'});
+      }
+    }
+  })
 }
 
 function resetTokenServer (req, res, next){
