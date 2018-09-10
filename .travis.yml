@@ -1,29 +1,26 @@
-sudo: required
 language: node_js
 node_js:
   - "8"
-services:
-  - docker
-
 env:
-  DOCKER_COMPOSE_VERSION: 1.8.0
+  global:
+    - PORT=8080
+    - DB_HOST=127.0.0.1
+    - DB_PORT=5432
+    - DB_USER=travis
+    - DB_PASSWORD=postgres
+
+services:
+  - postgres
 
 before_install:
+  - postgres -u root -e "SET PASSWORD FOR 'travis'@'localhost' = PASSWORD('postgres')"
+  - postgres -u travis --password="postgres" < postgres-sql/database.sql
 
-  - sudo apt-get update
-  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
-  - docker-compose --version
-
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-
-before_script:
-  - docker-compose pull
-  - docker-compose build
+install:
+  - npm install
+  - npm install -g coveralls
 
 script:
-  - sudo docker-compose run test
-
+  - ./node_modules/nyc/bin/nyc.js --exclude test --reporter lcovonly npm run test:all
+  - coveralls
 

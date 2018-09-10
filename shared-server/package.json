@@ -6,7 +6,10 @@
   "main": "service/server.js",
   "scripts": {
     "prestart": "nodemon -L app/bin/www",
-    "start": "node service/server.js"
+    "start": "node service/server.js",
+    "test": "npm run build && mocha --exit --recursive test/unit",
+    "test-integration": "npm run build && mocha --exit --recursive test/integration",
+    "test-all": "npm run build && mocha --exit --recursive test"
   },
   "dependencies": {
     "express": "^4.16.1",
