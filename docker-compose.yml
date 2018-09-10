@@ -1,5 +1,10 @@
 version: "2"
 services:
+  test-unit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:  
   shared-server:
     depends_on:
     - postgres
@@ -23,3 +28,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    volumes:
+    - ./postgres-sql/pgdata:/var/lib/postgresql/data
+volumes:
+    pgdata: {}

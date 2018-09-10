@@ -1,3 +1,8 @@
+Travis CI
+==========
+[![Build Status](https://travis-ci.org/rubenJimenez33/taller2-2018-2C-grupo5-shared-server.svg?branch=master)](https://travis-ci.org/rubenJimenez33/taller2-2018-2C-grupo5-shared-server)
+
+
 Install Docker
 ==============
 
@@ -26,6 +31,11 @@ Para el ambiente de desarrollo utilizamos un override, que permite hacer hotreal
 $ sudo docker-compose build
 $ sudo docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
  
+Consultas desde curl
+=========================
 
+ $ curl -X POST "http://localhost:8080/api/servers" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{ \"createdBy\": \"anyUser\",\"name\": \"nameServer\"}"
 
- 
+ $ curl curl -X GET "http://localhost:8080/api/servers" -H  "accept: application/json" -H "access-token: token"
+
+ $ curl curl -X DELETE "http://localhost:8080/api/servers/id" -H  "accept: application/json" -H "access-token: token"

@@ -10,9 +10,5 @@ services:
     - './shared-server/tracking:/app/tracking'
     - './shared-server/user:/app/user'
     - './shared-server/others:/app/others'
-  postgres:
-    volumes:
-    - ./postgres-sql/pgdata:/var/lib/postgresql/data
-volumes:
-    pgdata: {}
+    - './shared-server/test:/app/test'
 
