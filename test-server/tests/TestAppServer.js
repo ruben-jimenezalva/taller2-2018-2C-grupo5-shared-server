@@ -1,13 +1,13 @@
 'use strict';
 
-//const chai = require('chai');
-//var chaiHttp = require('chai-http');
+const chai = require('chai');
+var chaiHttp = require('chai-http');
 const expect = require('chai').expect;
 //var bodyParser = require('body-parser');
-const fetch = require('node-fetch');
+//const fetch = require('node-fetch');
 
-//chai.use(chaiHttp);
-const url= "http://127.0.0.1:8080";
+chai.use(chaiHttp);
+const url= "http://shared-server:8080";
 
 /*
 //start body-parser configuration
@@ -33,33 +33,30 @@ describe('Insert Server ',() =>{
 /*
 describe('get all Servers ',() =>{
     it('should fail because no use token',(done) =>{
-        chai.request(url)
-            .get('/api/server')
-            .end( function (res,err){
-                console.log('--SALIDA--')
-                console.log(res)
-                expect(res).to.have.status(401);
+        chai.request(url).get('/api/server')
+            .end( function (err,res){
+                console.log('--SALIDA--');
+                console.log(res);
+                expect(res).to.have.status(5);
                 done();
             });
     });
 });
 */
-/*
+
 describe('test Hello World',() =>{
-    it('too bien',() =>{
+    it('todo bien',(done) =>{
         chai.request(url).get('/')
-            .end( function (res,err){
+            .end( function (err,res){
                 console.log('--SALIDA-res-');
                 console.log(res);
-                console.log('--SALIDA-err-');
-                console.log(err);
-                expect(res).to.be.text;
-                //done();
+                expect(res.text).to.have.text;
+                done();
             });
     });
 });
-*/
 
+/*
 describe('API REST', function () {
     it('GET /users debe devolver todos los usuarios', async () => {
    
@@ -67,17 +64,6 @@ describe('API REST', function () {
       console.log('--SALIDA-res-');
       console.log(response);
       expect(response.status).to.be.text;
- /*  
-      const users = await response.json();
-      expect(users).to.be.an('Array');
-      for (let usr of users) {
-        expect(usr).to.be.an('Object');
-        expect(usr.id).to.be.a('Number');
-        expect(usr.name).to.be.a('String');
-        expect(usr.username).to.be.a('String');
-        expect(usr.email).to.be.a('String');
-      }
-   
-   */
     });
 });
+*/
