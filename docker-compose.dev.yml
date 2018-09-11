@@ -11,4 +11,6 @@ services:
     - './shared-server/user:/app/user'
     - './shared-server/others:/app/others'
     - './shared-server/test:/app/test'
-
+  test-server:
+    volumes:
+    - ./test-server/tests:/app/tests

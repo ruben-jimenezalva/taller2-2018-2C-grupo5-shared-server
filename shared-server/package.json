@@ -6,8 +6,7 @@
   "main": "service/server.js",
   "scripts": {
     "prestart": "nodemon -L app/bin/www",
-    "start": "node service/server.js",
-    "test": "./node_modules/.bin/mocha --reporter spec"
+    "start": "node service/server.js"
   },
   "dependencies": {
     "express": "^4.16.1",

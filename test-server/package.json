@@ -1,0 +1,18 @@
+{
+  "name": "test-server",
+  "version": "1.0.0",
+  "description": "Test Node.js on Docker",
+  "author": "Ruben Jimenez",
+  "main": "tests/*.js",
+  "scripts": {
+    "test": "docker-compose up test",
+    "start": "mocha --reporter spec ./tests/*.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "chai":"^4.1.2",
+    "mocha":"^4.0.1",
+    "chai-http":"^4.2.0",
+    "node-fetch":"^2.2.0"
+  }
+}

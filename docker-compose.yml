@@ -1,5 +1,14 @@
 version: "2"
 services:
+  test-server:
+    depends_on:
+      - shared-server
+      - postgres
+    build: ./test-server
+    links:
+      - shared-server
+      - postgres
+
   shared-server:
     depends_on:
     - postgres
