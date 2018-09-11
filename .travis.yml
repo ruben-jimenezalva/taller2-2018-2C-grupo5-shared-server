@@ -19,6 +19,6 @@ install:
   - npm install -g coveralls
 
 script:
-  - ./node_modules/nyc/bin/nyc.js --exclude test --reporter lcovonly npm run test-all
+  - npm test
   - coveralls
 
