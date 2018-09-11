@@ -1,20 +1,21 @@
 language: node_js
 node_js:
   - "8"
+addons:
+  postgresql: "10.5"
 env:
   global:
     - PORT=8080
-    - DB_HOST=127.0.0.1
-    - DB_PORT=5432
-    - DB_USER=travis
-    - DB_PASSWORD=postgres
+    - PGHOST=127.0.0.1
+    - PGPORT=5432
+    - PGUSER=travis
+    - PGPASSWORD=postgres
 
 services:
-  - postgres
+  - postgresql
 
 before_install:
-  - postgres -u root -e "SET PASSWORD FOR 'travis'@'localhost' = PASSWORD('postgres')"
-  - postgres -u travis --password="postgres" < postgres-sql/database.sql
+  - psql -u travis --password="postgres" < postgres-sql/database.sql
 
 install:
   - npm install
