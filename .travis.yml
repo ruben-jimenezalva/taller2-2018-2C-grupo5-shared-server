@@ -1,8 +1,6 @@
 language: node_js
 node_js:
   - "8"
-addons:
-  postgresql: "10.5"
 env:
   global:
     - PORT=8080
@@ -15,8 +13,8 @@ services:
   - postgresql
 
 before_install:
-  - psql -u travis --password="postgres" < postgres-sql/database.sql
-
+  - psql -U postgres --postgres-sql/database.sql
+  - psql -h localhost -U travis -p 5432 -a -q -f postgres-sql/database.sql
 install:
   - npm install
   - npm install -g coveralls
