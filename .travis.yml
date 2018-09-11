@@ -13,7 +13,6 @@ services:
   - postgresql
 
 before_install:
-  - psql -U postgres --postgres-sql/database.sql
   - psql -h localhost -U travis -p 5432 -a -q -f postgres-sql/database.sql
 install:
   - npm install
