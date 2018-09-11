@@ -22,7 +22,7 @@ install:
   - docker-compose build
 
 script:
-  - sudo docker-compose run test-server
+  - sudo docker-compose -f docker-compose.yml -f docker-compose.dev.yml up test-server
 
 after_script:
   - sudo docker stop $(docker ps -a -q)
