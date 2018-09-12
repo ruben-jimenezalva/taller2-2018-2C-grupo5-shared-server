@@ -29,7 +29,7 @@ Desarrollo (Full System)
 Para el ambiente de desarrollo utilizamos un override, que permite hacer hotrealod del código.
 
 $ sudo docker-compose build
-$ sudo docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+$ sudo docker-compose up
  
 Consultas desde curl
 =========================
