@@ -7,6 +7,9 @@ services:
     build: ./test-server
     links:
       - shared-server
+    volumes:
+      - ./test-server/tests:/app/tests
+
   shared-server:
     depends_on:
     - postgres
@@ -22,11 +25,22 @@ services:
     restart: always
     links:
     - postgres
+    volumes:
+      - './shared-server/*:/app/webapp/'
+      - './shared-server/service:/app/service'
+      - './shared-server/appServer:/app/appServer'
+      - './shared-server/auth:/app/auth'
+      - './shared-server/delivery:/app/delivery'
+      - './shared-server/payment:/app/payment'
+      - './shared-server/tracking:/app/tracking'
+      - './shared-server/user:/app/user'
+      - './shared-server/others:/app/others'
+
   postgres:
     build: ./postgres-sql
     container_name: pg_container
     ports:
-    - "5432:5432"
+    - "5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
