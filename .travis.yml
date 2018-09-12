@@ -3,5 +3,9 @@ language: generic
 
 services:
   - docker
+
+before_script:
+  - sudo docker-compose up -d shared-server
+
 script:
   - sudo docker-compose up test-server
