@@ -5,6 +5,6 @@ COPY package*.json ./
 RUN npm install
 ADD nodemon.json /app/nodemon.json
 COPY . .
-EXPOSE $PORT
+EXPOSE 8080
 CMD [ "npm", "start" ]
 
