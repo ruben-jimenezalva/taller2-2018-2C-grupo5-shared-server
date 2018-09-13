@@ -16,5 +16,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/servers', AppServer);
 
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+app.listen(PORT, () =>{
+  `App running on port ${PORT}`
+});
+        
