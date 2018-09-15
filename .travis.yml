@@ -4,7 +4,7 @@ language: generic
 services:
   - docker
   
-before_script:
+install:
   - sudo docker-compose up shared-server
 
 script:
