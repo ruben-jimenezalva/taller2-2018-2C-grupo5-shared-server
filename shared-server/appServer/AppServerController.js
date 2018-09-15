@@ -5,18 +5,18 @@ const metadataResp = {version: config.apiVersion};
 
 function getAllServers (req, res, next){
     var client = req.client;
-    client.query('SELECT * FROM servers', (err, resp) => {
+    client.query('SELECT * FROM server', (err, resp) => {
         if (err) {
         res.status(500).json({code: 500, message: err.message});
         } else {
-            res.status(200).json({metadata: metadataResp, servers: resp.rows});
+            res.status(200).json({metadata: metadataResp, server: resp.rows});
         }
     }) 
 }
 
 function createServer (req, res, next){
     var client = req.client;
-    const text = 'INSERT INTO Servers(createdBy, nameServer) VALUES($1, $2) RETURNING *';
+    const text = 'INSERT INTO server(createdBy, nameServer) VALUES($1, $2) RETURNING *';
     var createdBy = req.body.createdBy || '';
     var name = req.body.name || '';
 
@@ -46,7 +46,7 @@ function createServer (req, res, next){
 
 function getSingleServer (req, res, next){
     var client = req.client;
-    const text = 'SELECT * FROM Servers WHERE server_id=$1';
+    const text = 'SELECT * FROM server WHERE server_id=$1';
     client.query(text, [req.params.id], (err, resp) => {
     if (err) {
         res.status(500).json({code: 500, data: err.message});
@@ -63,7 +63,7 @@ function getSingleServer (req, res, next){
 //preguntar bien
 function updateServer (req, res, next){
 /*    var client = req.client;
-    const text = 'UPDATE Servers() VALUES () WHERE server_id=$1';
+    const text = 'UPDATE server() VALUES () WHERE server_id=$1';
     client.query(text, [req.params.id], (err, resp) => {
     if (err) {
         res.status(500).json({code: 500, data: err.message});
@@ -82,16 +82,16 @@ res.send('updateServer\n');
 
 function removeServer (req, res, next){
     var client = req.client;
-    const text = 'DELETE FROM Servers WHERE server_id=$1';
+    const text = 'DELETE FROM server WHERE server_id=$1)';
 
     client.query(text, [req.params.id], (err, resp) => {
         if (err) {
             res.status(500).json({code: 500, message: err.message});
         }else {
             if(resp.rowCount == 0){
-                res.status(404).json({code:404, data:'No existe el recurso solicitado'});
+                res.status(410).json({code:404, data:'No existe el recurso solicitado'});
             }else{
-                res.status(204).json({code:204 , message: 'Baja correcta'});
+                res.status(204).json({code:204 , message: "el registro fue eliminado"});
             }
         }
     })

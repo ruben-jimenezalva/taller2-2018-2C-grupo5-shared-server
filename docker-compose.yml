@@ -44,7 +44,4 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - ./shared-server/postgres-sql/pgdata:/var/lib/postgresql/data
       - ./shared-server/postgres-sql/database.sql:/docker-entrypoint-initdb.d/database.sql
-volumes:
-    pgdata: {}
