@@ -1,5 +1,3 @@
-CREATE DATABASE services_db;
-
 CREATE EXTENSION "uuid-ossp";
 
 CREATE TABLE server (

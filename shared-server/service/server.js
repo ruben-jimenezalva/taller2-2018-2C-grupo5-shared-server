@@ -5,7 +5,6 @@ var AppServer = require('../appServer/AppServer');
 
 // Constants
 const PORT = process.env.PORT;
-const HOST = '0.0.0.0';
 
 // App
 const app = express();

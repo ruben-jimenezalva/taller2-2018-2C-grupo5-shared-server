@@ -39,7 +39,7 @@ describe('create server',() =>{
     it('should get token, register success',(done) =>{
         chai.request(url)
             .post('/api/servers')
-            .send({createdBy:"autor1", name:"server3"})
+            .send({createdBy:"autor1", name:"server1"})
             .end( function (err,res){
                 expect(res).to.have.status(200);
                 var object = JSON.parse(res.text);

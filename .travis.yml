@@ -4,8 +4,11 @@ language: generic
 services:
   - docker
   
+pre_install:
+  - sudo docker-compose build
+
 install:
-  - sudo docker-compose up shared-server
+  - sudo docker-compose up shared-server postgres
 
 script:
   - sudo docker-compose up test-server

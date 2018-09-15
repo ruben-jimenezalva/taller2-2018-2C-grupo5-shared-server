@@ -23,6 +23,7 @@ services:
       - PGHOST=postgres
       - PGPORT=5432
       - PORT=8080
+      - DATABASE_URL=postgres://user:password@postgres:5432/
     restart: always
     links:
       - postgres
@@ -42,7 +43,7 @@ services:
     ports:
       - "5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
     volumes:
       - ./shared-server/postgres-sql/database.sql:/docker-entrypoint-initdb.d/database.sql

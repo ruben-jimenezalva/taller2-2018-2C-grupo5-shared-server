@@ -11,6 +11,7 @@ function getAllServers (req, res, next){
         } else {
             res.status(200).json({metadata: metadataResp, server: resp.rows});
         }
+        client.end();
     }) 
 }
 
@@ -26,20 +27,21 @@ function createServer (req, res, next){
 
     const values = [createdBy,name];
     client.query(text, values, (err, resp) => {
-    if (err) {
-        res.status(500).json({code: 500, message: err.message});
-    } else {
-        // create token
-        var jsonValue = JSON.parse(JSON.stringify(resp.rows[0])); 
-        var token = jwt.sign (jsonValue, config.secret, {
-            expiresIn: config.expireTime
-        });
+        if (err) {
+            res.status(500).json({code: 500, message: err.message});
+        } else {
+            // create token
+            var jsonValue = JSON.parse(JSON.stringify(resp.rows[0])); 
+            var token = jwt.sign (jsonValue, config.secret, {
+                expiresIn: config.expireTime
+            });
 
-        //send result
-        tokenResp = {expiresAt:config.expireTime, token:token};
-        serverResp={server:resp.rows[0], token: tokenResp};
-        res.status(200).json({metadata: metadataResp, server: serverResp});
-      }
+            //send result
+            tokenResp = {expiresAt:config.expireTime, token:token};
+            serverResp={server:resp.rows[0], token: tokenResp};
+            res.status(200).json({metadata: metadataResp, server: serverResp});
+        }
+        client.end();
     })
 }
 
@@ -48,15 +50,16 @@ function getSingleServer (req, res, next){
     var client = req.client;
     const text = 'SELECT * FROM server WHERE server_id=$1';
     client.query(text, [req.params.id], (err, resp) => {
-    if (err) {
-        res.status(500).json({code: 500, data: err.message});
-    } else {
-        if(resp.rowCount == 0){
-          res.status(404).json({code: 404, message:'Servidor inexistente'});
-        }else{
-          res.status(200).json({metadata: metadataResp, server: resp.rows});
+        if (err) {
+            res.status(500).json({code: 500, data: err.message});
+        } else {
+            if(resp.rowCount == 0){
+            res.status(404).json({code: 404, message:'Servidor inexistente'});
+            }else{
+            res.status(200).json({metadata: metadataResp, server: resp.rows});
+            }
         }
-      }
+        client.end();
     })
 }
 
@@ -94,6 +97,7 @@ function removeServer (req, res, next){
                 res.status(204).json({code:204 , message: "el registro fue eliminado"});
             }
         }
+        client.end();
     })
 }
 
