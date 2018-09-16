@@ -1,5 +1,6 @@
-var jwt = require('jsonwebtoken');
-var config = require('../others/Constants'); // get our config file
+const jwt = require('jsonwebtoken');
+const config = require('../others/Constants'); // get our config file
+const tokenController = require('../auth/TokenController');
 const metadataResp = {version: config.apiVersion};
 
 
@@ -30,11 +31,10 @@ function createServer (req, res, next){
         if (err) {
             res.status(500).json({code: 500, message: err.message});
         } else {
+
             // create token
-            var jsonValue = JSON.parse(JSON.stringify(resp.rows[0])); 
-            var token = jwt.sign (jsonValue, config.secret, {
-                expiresIn: config.expireTime
-            });
+            var server_id = resp.rows[0].server_id;
+            var token = tokenController.createToken(server_id);
 
             //send result
             tokenResp = {expiresAt:config.expireTime, token:token};

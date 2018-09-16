@@ -3,7 +3,7 @@ var router = express.Router();
 var db = require('./AppServerController');
 var bodyParser = require('body-parser');
 var connect_db = require('../service/Connect');
-var verifyToken = require('../auth/VerifyToken');
+var TokenController = require('../auth/TokenController');
 
 //start body-parser configuration
 router.use(bodyParser.json() );       // to support JSON-encoded bodies
@@ -11,12 +11,22 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }));
 
-//Application Servers with token
-router.get('/',connect_db,verifyToken,db.getAllServers);
+//get all app servers
+router.get('/',connect_db,TokenController.verifyToken,db.getAllServers);
+
+//create a app server
 router.post('/',connect_db, db.createServer);
-router.get('/:id',connect_db,verifyToken, db.getSingleServer);
-router.put('/:id',connect_db,verifyToken, db.updateServer);
-router.delete('/:id',connect_db,verifyToken, db.removeServer);
+
+//get single app server
+router.get('/:id',connect_db,TokenController.verifyToken, db.getSingleServer);
+
+//update a app server
+router.put('/:id',connect_db,TokenController.verifyToken, db.updateServer);
+
+//delete a app server
+router.delete('/:id',connect_db,TokenController.verifyToken, db.removeServer);
+
+//reset token of app server
 router.post('/:id',connect_db, db.resetTokenServer);
 
 module.exports = router;

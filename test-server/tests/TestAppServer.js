@@ -39,7 +39,7 @@ describe('create server',() =>{
     it('should get token, register success',(done) =>{
         chai.request(url)
             .post('/api/servers')
-            .send({createdBy:"autor1", name:"server1"})
+            .send({createdBy:"autor1", name:"server5"})
             .end( function (err,res){
                 expect(res).to.have.status(200);
                 var object = JSON.parse(res.text);
@@ -55,7 +55,7 @@ describe('get all server with token',() =>{
     it('should get all servers with success',(done) =>{
         chai.request(url)
             .get('/api/servers')
-            .set({'access-token':token})
+            .set({'Authorization':token})
             .end( function (err,res){
                 expect(res).to.have.status(200);
                 done();
@@ -71,7 +71,7 @@ describe('get single server with token',() =>{
         chai.request(url)
             .get('/api/servers/')
             .send({id:id})
-            .set({'access-token':token})
+            .set({'Authorization':token})
             .end( function (err,res){
                 expect(res).to.have.status(200);
                 done();
@@ -87,7 +87,7 @@ describe('delete server',() =>{
         chai.request(url)
             .delete('/api/servers/')
             .send({id:id})
-            .set({'access-token':token})
+            .set({'Authorization':token})
             .end( function (err,res){
                 console.log("---res---");
                 console.log(res);
