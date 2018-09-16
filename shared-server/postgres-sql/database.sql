@@ -7,8 +7,14 @@ CREATE TABLE server (
     createdTime TIMESTAMP DEFAULT NOW(),
     lastConnection TIMESTAMP,
     _rev VARCHAR(50),
-    token VARCHAR(350),
     UNIQUE(nameServer,createdBy),
+    PRIMARY KEY (server_id)
+);
+
+CREATE TABLE token (
+    server_id UUID,
+    token VARCHAR(350),
+    FOREIGN kEY (server_id) REFERENCES server(server_id),    
     PRIMARY KEY (server_id)
 );
 

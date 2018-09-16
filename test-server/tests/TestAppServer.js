@@ -3,6 +3,8 @@
 const chai = require('chai');
 var chaiHttp = require('chai-http');
 const expect = require('chai').expect;
+const assert = chai.assert;
+const fetch = require('node-fetch');
 var token;
 var id;
 
@@ -39,12 +41,12 @@ describe('create server',() =>{
     it('should get token, register success',(done) =>{
         chai.request(url)
             .post('/api/servers')
-            .send({createdBy:"autor1", name:"server5"})
+            .send({createdBy:"autor1", name:"server29"})
             .end( function (err,res){
                 expect(res).to.have.status(200);
                 var object = JSON.parse(res.text);
                 token = object.server.token.token;
-                id = object.server.server.id;
+                id = object.server.server.server_id;
                 done();
             });
     });
@@ -64,36 +66,30 @@ describe('get all server with token',() =>{
 });
 
 
-
-
 describe('get single server with token',() =>{
     it('should get single server with success',(done) =>{
         chai.request(url)
-            .get('/api/servers/')
-            .send({id:id})
+            .get('/api/servers/'+id)
             .set({'Authorization':token})
             .end( function (err,res){
                 expect(res).to.have.status(200);
+                var object = JSON.parse(res.text);
+                assert.equal(object.server.server_id,id);
                 done();
             });
     });
 });
 
 
-/**no funciona ver porque */
-/*
+
 describe('delete server',() =>{
     it('should delete single server with success',(done) =>{
         chai.request(url)
-            .delete('/api/servers/')
-            .send({id:id})
+            .delete('/api/servers/'+id)
             .set({'Authorization':token})
             .end( function (err,res){
-                console.log("---res---");
-                console.log(res);
-                expect(res).to.have.status(204);
+                expect(res).to.have.status(203);
                 done();
             });
     });
 });
-*/
