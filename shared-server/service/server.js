@@ -2,6 +2,7 @@
 
 const express = require('express');
 var AppServer = require('../appServer/AppServer');
+const logger = require('../others/logger');
 
 // Constants
 const PORT = process.env.PORT;
@@ -16,6 +17,7 @@ app.get('/', (req, res) => {
 app.use('/api/servers', AppServer);
 
 app.listen(PORT, () =>{
-  console.log(`App running on port ${PORT}`);
+  var message = `App running on port ${PORT}`;
+  logger.info(message);
 });
         

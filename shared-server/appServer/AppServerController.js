@@ -1,10 +1,10 @@
 const config = require('../others/Constants'); // get our config file
 const tokenController = require('../auth/TokenController');
 const metadataResp = {version: config.apiVersion};
+var connect_db = require('../service/Connect');
 
 function getAllServers (req, res, next){
-    var client = req.client;
-
+    connect_db
     client.query("select * FROM server", (err, resp) => {
         if (err) {
         res.status(500).json({code: 500, message: err.message});
@@ -35,8 +35,9 @@ function createServer (req, res, next){
 
             // create token
             var server_id = resp.rows[0].server_id;
-            var token = tokenController.createToken(server_id);
-            req.server_id = server_id;
+            req.server_id= server_id;
+            var token = tokenController.createToken();
+            //req.server_id = server_id;
             req.token = token;
             
             //send result
@@ -98,7 +99,7 @@ function updateServer (req, res, next){
             if(resp.rows == ''){
             res.status(404).json({code: 404, data:'Servidor inexistente'});
             }else{
-            res.status(200).json({metadata: metadataResp, server: resp.rows});
+            res.status(200).json({metadata: metadataResp, server: resp.rows[0]});
             }
         }
         client.end();
@@ -139,7 +140,59 @@ function deleteToken (req, res, next){
 
 
 function resetTokenServer (req, res, next){
-    res.send('resetTokenServer\n');
+
+    var client = req.client;
+    var text = 'SELECT * FROM server WHERE server_id=$1';
+    var server;
+    var server_id = req.params.id;
+    var old_token;
+
+    client.query(text, [server_id], (err, resp) => {
+        if (err) {
+           return res.status(500).json({code: 500, data: err.message});
+        } else {
+            if(resp.rowCount == 0){
+               return res.status(404).json({code: 404, message:'Servidor inexistente'});
+            }else{
+                server = resp.rows[0];
+
+                text = 'SELECT * FROM token WHERE server_id=$1';
+                client.query(text, [server_id], (err, resp) => {
+                    if (err) {
+                        res.status(500).json({code: 500, data: err.message});
+                    } else {
+                        if(resp.rowCount == 0){
+                            return res.status(404).json({code: 404, message:'no existe un token asociado al servidor'});
+                        }else{
+                            old_token = resp.rows[0].token;
+                            //res.send(old_token);
+                            
+                            resp_inva = tokenController.invalidateToken(old_token);
+                            if (resp_inva < 0){
+                                res.status(500).json({code:500, message:"Unexpected error"});
+                            }
+            
+                            var new_token = tokenController.createToken(server_id);
+            
+                            //update token
+                            client.query('UPDATE token SET token=$1 WHERE server_id=$2',[new_token,server_id],(error, response) => {
+                                if(error)
+                                    console.log(error);
+                                else{
+                                    console.log("fue actualizado");
+                                    tokenResp = {expiresAt:config.expireTime, token:new_token};
+                                    serverResp={server:server, token: tokenResp};
+                                    res.status(200).json({metadata: metadataResp, server: serverResp});
+                                    }
+                                client.end();
+                            });
+                        }
+                    }
+                    //client.end();
+                })
+            }
+        }
+    })
 }
 
 

@@ -66,6 +66,7 @@ describe('get all server with token',() =>{
 });
 
 
+
 describe('get single server with token',() =>{
     it('should get single server with success',(done) =>{
         chai.request(url)
@@ -80,6 +81,31 @@ describe('get single server with token',() =>{
     });
 });
 
+describe('get single server with token',() =>{
+    it('should no get single server because id no exists',(done) =>{
+        chai.request(url)
+            .get('/api/servers/aaaaaaaa-bbbb-cccc-dddd-eeeeffff0002')
+            .set({'Authorization':token})
+            .end( function (err,res){
+                expect(res).to.have.status(404);
+                var object = JSON.parse(res.text);
+                assert.equal(object.code,404);
+                done();
+            });
+    });
+});
+
+describe('get single server with false token',() =>{
+    it('should no get single server',(done) =>{
+        chai.request(url)
+            .get('/api/servers/'+id)
+            .set({'Authorization':url})
+            .end( function (err,res){
+                expect(res).to.have.status(401);
+                done();
+            });
+    });
+});
 
 
 describe('delete server',() =>{
