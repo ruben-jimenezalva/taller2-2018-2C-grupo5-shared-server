@@ -7,20 +7,19 @@ CREATE TABLE server (
     createdTime TIMESTAMP DEFAULT NOW(),
     lastConnection TIMESTAMP,
     _rev VARCHAR(50),
+    jti VARCHAR(50),
     UNIQUE(nameServer,createdBy),
     PRIMARY KEY (server_id)
 );
 
-CREATE TABLE token (
-    server_id UUID,
-    token VARCHAR(350),
-    FOREIGN kEY (server_id) REFERENCES server(server_id),    
-    PRIMARY KEY (server_id)
+CREATE TABLE blackListToken (
+    jti VARCHAR(50)
 );
 
 CREATE TABLE users (
     username VARCHAR(50),
     password VARCHAR(50) NOT NULL,
+    jti VARCHAR(50),
     PRIMARY KEY (username)
 );
 

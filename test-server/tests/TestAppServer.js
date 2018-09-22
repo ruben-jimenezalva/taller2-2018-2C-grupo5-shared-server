@@ -6,7 +6,10 @@ const expect = require('chai').expect;
 const assert = chai.assert;
 const fetch = require('node-fetch');
 var token;
+var newToken;
 var id;
+var dataName = "server1100";
+var dataCreatedBy = "autor1100";
 
 chai.use(chaiHttp);
 const url= "http://shared-server:8080";
@@ -41,19 +44,20 @@ describe('create server',() =>{
     it('should get token, register success',(done) =>{
         chai.request(url)
             .post('/api/servers')
-            .send({createdBy:"autor1", name:"server29"})
+            .timeout(10000)
+            .send({createdBy:dataCreatedBy, name:dataName})
             .end( function (err,res){
                 expect(res).to.have.status(200);
                 var object = JSON.parse(res.text);
                 token = object.server.token.token;
-                id = object.server.server.server_id;
+                id = object.server.server.id;
                 done();
             });
     });
 });
 
 
-describe('get all server with token',() =>{
+describe('get all servers with token',() =>{
     it('should get all servers with success',(done) =>{
         chai.request(url)
             .get('/api/servers')
@@ -75,7 +79,7 @@ describe('get single server with token',() =>{
             .end( function (err,res){
                 expect(res).to.have.status(200);
                 var object = JSON.parse(res.text);
-                assert.equal(object.server.server_id,id);
+                assert.equal(object.server.id,id);
                 done();
             });
     });
@@ -108,13 +112,54 @@ describe('get single server with false token',() =>{
 });
 
 
+describe('reset token of a server',() =>{
+    it('should update the token',(done) =>{
+        chai.request(url)
+            .post('/api/servers/'+id)
+            .end( function (err,res){
+                expect(res).to.have.status(201);
+                var object = JSON.parse(res.text);
+                newToken = object.server.token.token;
+                done();
+            });
+    });
+});
+
+
+describe('get all servers with token canceled by a reset',() =>{
+    it('should fail get all servers because token is invalid',(done) =>{
+        chai.request(url)
+            .get('/api/servers')
+            .set({'Authorization':token})
+            .end( function (err,res){
+                expect(res).to.have.status(401);
+                done();
+            });
+    });
+});
+
+
+
 describe('delete server',() =>{
     it('should delete single server with success',(done) =>{
         chai.request(url)
             .delete('/api/servers/'+id)
-            .set({'Authorization':token})
+            .set({'Authorization':newToken})
             .end( function (err,res){
                 expect(res).to.have.status(203);
+                done();
+            });
+    });
+});
+
+
+describe('get all servers with token canceled by a deleted server',() =>{
+    it('should fail get all servers because token is invalid',(done) =>{
+        chai.request(url)
+            .get('/api/servers')
+            .set({'Authorization':newToken})
+            .end( function (err,res){
+                expect(res).to.have.status(401);
                 done();
             });
     });
