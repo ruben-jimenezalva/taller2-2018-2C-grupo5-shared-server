@@ -8,6 +8,8 @@ const fetch = require('node-fetch');
 var token;
 var newToken;
 var id;
+var _rev;
+var new_rev;
 var dataName = "server1100";
 var dataCreatedBy = "autor1100";
 
@@ -51,6 +53,7 @@ describe('create server',() =>{
                 var object = JSON.parse(res.text);
                 token = object.server.token.token;
                 id = object.server.server.id;
+                _rev = object.server.server._rev;
                 done();
             });
     });
@@ -138,6 +141,65 @@ describe('get all servers with token canceled by a reset',() =>{
     });
 });
 
+
+
+describe('update server with field _rev & name nulls',() =>{
+    it('should fail update because _rev & name are nulls',(done) =>{
+        chai.request(url)
+            .put('/api/servers/'+id)
+            .send({_rev:'', name:''})
+            .set({'Authorization':newToken})
+            .end( function (err,res){
+                expect(res).to.have.status(400);
+                done();
+            });
+    });
+});
+
+
+
+describe('update server with field _rev invalid',() =>{
+    it('should fail update _rev is invalid',(done) =>{
+        chai.request(url)
+            .put('/api/servers/'+id)
+            .send({_rev:"nananananabatman", name:"newName"})
+            .set({'Authorization':newToken})
+            .end( function (err,res){
+                expect(res).to.have.status(409);
+                done();
+            });
+    });
+});
+
+
+describe('update server with field _rev valid',() =>{
+    it('should update with success',(done) =>{
+        chai.request(url)
+            .put('/api/servers/'+id)
+            .send({_rev:_rev, name:"newName"})
+            .set({'Authorization':newToken})
+            .end( function (err,res){
+                expect(res).to.have.status(200);
+                var object = JSON.parse(res.text);
+                new_rev = object.server._rev;
+                done();
+            });
+    });
+});
+
+
+describe('update server with new field _rev valid',() =>{
+    it('should update with success',(done) =>{
+        chai.request(url)
+            .put('/api/servers/'+id)
+            .send({_rev:new_rev, name:"newName2"})
+            .set({'Authorization':newToken})
+            .end( function (err,res){
+                expect(res).to.have.status(200);
+                done();
+            });
+    });
+});
 
 
 describe('delete server',() =>{
