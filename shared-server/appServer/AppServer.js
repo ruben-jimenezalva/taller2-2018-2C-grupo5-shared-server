@@ -4,6 +4,10 @@ var db = require('./AppServerController');
 var bodyParser = require('body-parser');
 var connect_db = require('../service/Connect');
 var TokenController = require('../auth/TokenController');
+var morgan = require('morgan');
+var logger = require('../others/logger');
+
+router.use(morgan('combined', { stream: logger.stream }));
 
 //start body-parser configuration
 router.use(bodyParser.json() );       // to support JSON-encoded bodies

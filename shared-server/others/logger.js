@@ -1,10 +1,7 @@
 'use strict';
 
 const winston = require('winston');
-const getNamespace = require('continuation-local-storage').getNamespace;
 var appRoot = require('app-root-path');
-
-console.log(`${appRoot}/logs/all-logs.log`);
 
 const winstonLogger = winston.createLogger({
     transports: [
@@ -16,14 +13,14 @@ const winstonLogger = winston.createLogger({
         maxsize: 5242880, // 5MB
         maxFiles: 5,
         colorize: false,
-        timestamp: true
+        timestamp: true,
       }),
       new winston.transports.Console({
         level: 'debug',
         handleExceptions: true,
         json: false,
         colorize: true,
-        timestamp: true
+        timestamp: true,
       })
     ],
     exitOnError: false
@@ -32,36 +29,28 @@ const winstonLogger = winston.createLogger({
   winstonLogger.stream = {
       write: function (message, encoding) {
           winstonLogger.info(message);
-      }
-  };
-  
-  
-  // Wrap Winston logger to print reqId in each log
-  var formatMessage = function(message) {
-      var myRequest = getNamespace('my request');
-      message = myRequest && myRequest.get('reqId') ? message + " reqId: " + myRequest.get('reqId') : message;
-      return message;
+      },
   };
   
   var logger = {
       log: function(level, message) {
-          winstonLogger.log(level, formatMessage(message));
+          winstonLogger.log(level,message,{timestamp: new Date()});
       },
       error: function(message) {
-          winstonLogger.error(formatMessage(message));
+          winstonLogger.error(message,{timestamp: new Date()});
       },
       warn: function(message) {
-          winstonLogger.warn(formatMessage(message));
+          winstonLogger.warn(message,{timestamp: new Date()});
       },
       verbose: function(message) {
-          winstonLogger.verbose(formatMessage(message));
+          winstonLogger.verbose(message,{timestamp: new Date()});
       },
       info: function(message) {
-          winstonLogger.info(formatMessage(message));
+          winstonLogger.info(message,{timestamp: new Date()});
       },
       debug: function(message) {
-          winstonLogger.debug(formatMessage(message));
+          winstonLogger.debug(message,{timestamp: new Date()});
       },
   };
-  
-  module.exports = logger;
+
+module.exports = logger;
