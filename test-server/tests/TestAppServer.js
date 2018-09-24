@@ -10,11 +10,21 @@ var newToken;
 var id;
 var _rev;
 var new_rev;
-var dataName = "server1100";
-var dataCreatedBy = "autor1100";
+var dataName = "server&***#$$$$+##++(-)11000";
+var dataCreatedBy = "autor&***$$+##++(-)11000";
 
 chai.use(chaiHttp);
 const url= "http://shared-server:8080";
+
+
+describe('TEST',() =>{
+    it('BEGIN TEST',(done) =>{
+        console.log("======================================");
+        console.log("============TEST APP SERVER===========");
+        console.log("======================================");
+        done();
+    });
+});
 
 
 describe('get all Servers ',() =>{

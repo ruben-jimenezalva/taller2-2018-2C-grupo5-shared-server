@@ -34,22 +34,27 @@ const winstonLogger = winston.createLogger({
   
   var logger = {
       log: function(level, message) {
-          winstonLogger.log(level,message,{timestamp: new Date()});
+            winstonLogger.log(level,message,{timestamp: new Date()});
       },
-      error: function(message) {
-          winstonLogger.error(message,{timestamp: new Date()});
+      error: function(file,nameFunction,message) {
+            var data = {timestamp: new Date(), file:file, function:nameFunction};
+            winstonLogger.error(message,data);
       },
-      warn: function(message) {
-          winstonLogger.warn(message,{timestamp: new Date()});
+      warn: function(file,nameFunction,message) {
+            var data = {timestamp: new Date(), file:file, function:nameFunction};
+            winstonLogger.warn(message,data);
       },
-      verbose: function(message) {
-          winstonLogger.verbose(message,{timestamp: new Date()});
+      verbose: function(file,nameFunction,message) {
+            var data = {timestamp: new Date(), file:file, function:nameFunction};
+            winstonLogger.verbose(message,data);
       },
-      info: function(message) {
-          winstonLogger.info(message,{timestamp: new Date()});
+      info: function(file,nameFunction,message) {
+            var data = {timestamp: new Date(), file:file, function:nameFunction};
+            winstonLogger.info(message,data);
       },
-      debug: function(message) {
-          winstonLogger.debug(message,{timestamp: new Date()});
+      debug: function(file,nameFunction,message) {
+            var data = {timestamp: new Date(), file:file, function:nameFunction};
+            winstonLogger.debug(message,data);
       },
   };
 

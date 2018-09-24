@@ -58,3 +58,6 @@ url_developed =http://localhost:8080/api/servers
  $ curl curl -X GET "url_ambiente" -H  "accept: application/json" -H "access-token: token"
 
  $ curl curl -X DELETE "url_ambiente -H  "accept: application/json" -H "access-token: token"
+
+
+ docker exec -tiu postgres container-postgres psql

@@ -1,8 +1,9 @@
 'use strict';
 
 const express = require('express');
-var AppServer = require('../appServer/AppServer');
 const logger = require('../others/logger');
+var AppServer = require('../appServer/AppServer');
+var Payment = require('../payment/Payment');
 
 // Constants
 const PORT = process.env.PORT;
@@ -15,9 +16,9 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/servers', AppServer);
+app.use('/api/payments', Payment);
 
 app.listen(PORT, () =>{
   var message = `App running on port ${PORT}`;
   logger.info(message);
 });
-        

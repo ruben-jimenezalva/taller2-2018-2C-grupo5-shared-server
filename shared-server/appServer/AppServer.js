@@ -28,9 +28,9 @@ router.get('/:id',connect_db,TokenController.verifyToken, db.getSingleServer);
 router.put('/:id',connect_db,TokenController.verifyToken, db.updateServer);
 
 //delete a app server
-router.delete('/:id',connect_db,TokenController.verifyToken, db.removeServer);
+router.delete('/:id',connect_db,TokenController.verifyToken,TokenController.invalidateToken,db.removePayments,db.removeTrackings, db.removeServer);
 
 //reset token of app server
-router.post('/:id',connect_db, db.resetTokenServer);
+router.post('/:id',connect_db,TokenController.invalidateToken,db.resetTokenServer);
 
 module.exports = router;
