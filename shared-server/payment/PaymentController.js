@@ -3,20 +3,22 @@ const logger =  require('../others/logger');
 
 function getMyPayments (req, res, next){
     var client = req.client;
+    var nameFunction = arguments.callee.name;
     client.query("select * FROM payment WHERE server_fk=$1",[req.id], (err, resp) => {
         if (err) {
-            logger.error(__filename +' - '+'getMyPayments,'+' - '+err.message);
+            logger.error(__filename,nameFunction,err.message);
             res.status(500).json({code: 500, message: err.message});
         } else {
             res.status(200).send(model.getMyPayments(resp));
             //res.status(200).send(resp.rows);
-            logger.info(__filename +' - '+'getMyPayments, get all my payments with success');
+            logger.info(__filename,nameFunction,'get all my payments with success');
         }
         client.end();
     })   
 }
   
 function createPayment (req, res, next){
+    var nameFunction = arguments.callee.name;
     var client = req.client;
     var text1 = "INSERT INTO payment(currency,value,server_fk,expiration_month,expiration_year,method,number,type)";
     var text2 = "VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *";
@@ -31,12 +33,12 @@ function createPayment (req, res, next){
     values = [currency,value,server_fk,expiration_month,expiration_year,method,number,type];
     client.query(text1+text2,values, (err, resp) => {
         if (err) {
-            logger.error(__filename +' - '+'createPayment,'+' - '+err.message);
+            logger.error(__filename,nameFunction,err.message);
             res.status(500).json({code: 500, message: err.message});
         } else {
             res.status(201).send(model.postCreatePayment(resp));
             //res.status(200).send(resp.rows[0]);
-            logger.info(__filename +' - '+'createPayment, create payment with success');
+            logger.info(__filename,nameFunction,'payment created with success');
         }
         client.end();
     })   
@@ -45,14 +47,15 @@ function createPayment (req, res, next){
 
 function getPaymentMethods (req, res, next){
     var client = req.client;
+    var nameFunction = arguments.callee.name;
     client.query("select * FROM payment", (err, resp) => {
         if (err) {
-            logger.error(__filename +' - '+'getPaymentMethods,'+' - '+err.message);
+            logger.error(__filename,nameFunction,err.message);
             res.status(500).json({code: 500, message: err.message});
         } else {
             res.status(200).send(model.getPaymentMethods(resp));
             //res.status(200).send(resp.rows);
-            logger.info(__filename +' - '+'getPaymentMethods, get all paymethods with success');
+            logger.info(__filename,nameFunction,'get all paymethods with success');
         }
         client.end();
     })   

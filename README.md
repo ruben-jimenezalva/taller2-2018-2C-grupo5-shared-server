@@ -61,3 +61,4 @@ url_developed =http://localhost:8080/api/servers
 
 
  docker exec -tiu postgres container-postgres psql
+  connections: SELECT query,query_start,usename,state FROM pg_stat_activity;

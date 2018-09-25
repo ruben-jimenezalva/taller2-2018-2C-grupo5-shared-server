@@ -26,7 +26,6 @@ CREATE TABLE users (
 CREATE TABLE tracking (
     tracking_id UUID DEFAULT uuid_generate_v1(),
     status VARCHAR(50) NOT NULL,
-    createdBy VARCHAR(50),
     updateAt TIMESTAMP,
     server_fk UUID, 
     FOREIGN kEY (server_fk) REFERENCES server(server_id),

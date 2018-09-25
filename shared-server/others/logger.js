@@ -26,13 +26,9 @@ const winstonLogger = winston.createLogger({
     exitOnError: false
   });
   
-  winstonLogger.stream = {
-      write: function (message, encoding) {
-          winstonLogger.info(message);
-      },
-  };
-  
+
   var logger = {
+
       log: function(level, message) {
             winstonLogger.log(level,message,{timestamp: new Date()});
       },
@@ -55,6 +51,13 @@ const winstonLogger = winston.createLogger({
       debug: function(file,nameFunction,message) {
             var data = {timestamp: new Date(), file:file, function:nameFunction};
             winstonLogger.debug(message,data);
+      },
+  };
+
+
+  logger.stream = {
+      write: function (message, encoding) {
+          winstonLogger.info(message);
       },
   };
 
