@@ -6,11 +6,9 @@ function createTracking (req, res, next){
     var server_fk = req.id;
     var nameFunction = arguments.callee.name;
     var status = req.body.status || '';
-    //var updateAt = req.body.updateAt || now();
-    var updateAt = new Date();
 
-    var text = 'INSERT INTO tracking(status,updateAt,server_fk) VALUES ($1,$2,$3) RETURNING*';
-    var values = [status,updateAt,server_fk];
+    var text = 'INSERT INTO tracking(status,server_fk) VALUES ($1,$2) RETURNING*';
+    var values = [status,server_fk];
     client.query(text,values,(err,resp)=>{
         if(err){
             logger.error(__filename,nameFunction,err.message);
@@ -18,6 +16,7 @@ function createTracking (req, res, next){
         }else{
             logger.info(__filename,nameFunction,'tracking created successfully');
             res.status(201).send(model.getInfoTracking(resp));
+            //res.status(201).send(resp.rows[0]);
         }
         client.end();
     });

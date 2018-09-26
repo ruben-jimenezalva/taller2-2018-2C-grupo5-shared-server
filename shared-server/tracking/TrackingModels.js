@@ -1,7 +1,7 @@
 
 function getInfoTracking(res){
     var tracking = {
-        "updateAt" : res.rows[0].updateAt,
+        "updateAt" : res.rows[0].updateat,
         "id" : res.rows[0].tracking_id,
         "status" : res.rows[0].status
     };

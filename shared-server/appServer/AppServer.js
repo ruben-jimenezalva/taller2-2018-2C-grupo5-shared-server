@@ -16,21 +16,21 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 //get all app servers
-router.get('/',connect_db,TokenController.verifyToken,db.getAllServers);
+router.get('/',connect_db,TokenController.verifyToken,db.updateLastConnection,db.getAllServers);
 
 //create a app server
 router.post('/',connect_db, db.createServer);
 
 //get single app server
-router.get('/:id',connect_db,TokenController.verifyToken, db.getSingleServer);
+router.get('/:id',connect_db,TokenController.verifyToken,db.updateLastConnection, db.getSingleServer);
 
 //update a app server
-router.put('/:id',connect_db,TokenController.verifyToken, db.updateServer);
+router.put('/:id',connect_db,TokenController.verifyToken,db.updateLastConnection,db.updateServer);
 
 //delete a app server
 router.delete('/:id',connect_db,TokenController.verifyToken,TokenController.invalidateToken,db.removePayments,db.removeTrackings, db.removeServer);
 
 //reset token of app server
-router.post('/:id',connect_db,TokenController.invalidateToken,db.resetTokenServer);
+router.post('/:id',connect_db,TokenController.invalidateToken,db.updateLastConnection,db.resetTokenServer);
 
 module.exports = router;

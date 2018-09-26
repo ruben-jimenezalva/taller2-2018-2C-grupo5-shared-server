@@ -205,6 +205,27 @@ function resetTokenServer (req, res, next){
 
 
 
+function updateLastConnection(req,res,next){
+    var client = req.client;
+    var server_id = req.id;
+    var nameFunction = arguments.callee.name;
+    var text = 'UPDATE server SET lastConnection=NOW() WHERE server_id=$1';
+
+    client.query(text,[server_id],(err,resp)=>{
+        if(err){
+            logger.error(__filename,nameFunction,err.message);
+            res.status(500).json({code:500, message:err.message});
+        }else{
+            logger.info(__filename,nameFunction,'update lastConnection succesfully');     
+            next();       
+        }
+    })
+}
+
+
+
+
+
 function removeTrackings (req, res, next){
     var client = req.client;
     const text = 'DELETE FROM tracking WHERE server_fk=$1 RETURNING *';
@@ -254,4 +275,5 @@ module.exports = {
     resetTokenServer: resetTokenServer,
     removeTrackings:removeTrackings,
     removePayments:removePayments,
+    updateLastConnection:updateLastConnection,
 };

@@ -5,7 +5,7 @@ CREATE TABLE server (
     nameServer VARCHAR(50) NOT NULL,
     createdBy VARCHAR(50) NOT NULL,
     createdTime TIMESTAMP DEFAULT NOW(),
-    lastConnection TIMESTAMP,
+    lastConnection TIMESTAMP DEFAULT NOW(),
     _rev VARCHAR(50),
     jti VARCHAR(50),
     UNIQUE(nameServer,createdBy),
@@ -26,7 +26,7 @@ CREATE TABLE users (
 CREATE TABLE tracking (
     tracking_id UUID DEFAULT uuid_generate_v1(),
     status VARCHAR(50) NOT NULL,
-    updateAt TIMESTAMP,
+    updateAt TIMESTAMP DEFAULT NOW(),
     server_fk UUID, 
     FOREIGN kEY (server_fk) REFERENCES server(server_id),
     PRIMARY KEY (tracking_id)
