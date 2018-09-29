@@ -1,8 +1,9 @@
 var logger = require('../others/logger');
 var model = require('./TrackingModels');
+var connect = require('../service/Connect');
 
 function createTracking (req, res, next){
-    var client = req.client;
+    var client = connect();
     var server_fk = req.id;
     var nameFunction = arguments.callee.name;
     var status = req.body.status || '';
@@ -23,7 +24,7 @@ function createTracking (req, res, next){
 }
 
 function getInfoTracking (req, res, next){
-    var client = req.client;
+    var client = connect();
     var server_fk = req.id;
     var nameFunction = arguments.callee.name;
     var text = 'SELECT * FROM tracking WHERE tracking_id=$1 and server_fk=$2 ';

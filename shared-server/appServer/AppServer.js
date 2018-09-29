@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var db = require('./AppServerController');
 var bodyParser = require('body-parser');
-var connect_db = require('../service/Connect');
 var TokenController = require('../auth/TokenController');
 var morgan = require('morgan');
 var logger = require('../others/logger');
@@ -16,21 +15,21 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 //get all app servers
-router.get('/',connect_db,TokenController.verifyToken,db.updateLastConnection,db.getAllServers);
+router.get('/',TokenController.verifyToken,db.getAllServers);
 
 //create a app server
-router.post('/',connect_db, db.createServer);
+router.post('/', db.createServer);
 
 //get single app server
-router.get('/:id',connect_db,TokenController.verifyToken,db.updateLastConnection, db.getSingleServer);
+router.get('/:id',TokenController.verifyToken, db.getSingleServer);
 
 //update a app server
-router.put('/:id',connect_db,TokenController.verifyToken,db.updateLastConnection,db.updateServer);
+router.put('/:id',TokenController.verifyToken,db.updateServer);
 
 //delete a app server
-router.delete('/:id',connect_db,TokenController.verifyToken,TokenController.invalidateToken,db.removePayments,db.removeTrackings, db.removeServer);
+router.delete('/:id',TokenController.verifyToken,db.removePayments,db.removeTrackings,TokenController.invalidateToken, db.removeServer);
 
 //reset token of app server
-router.post('/:id',connect_db,TokenController.invalidateToken,db.updateLastConnection,db.resetTokenServer);
+router.post('/:id',TokenController.invalidateToken,db.resetTokenServer);
 
 module.exports = router;

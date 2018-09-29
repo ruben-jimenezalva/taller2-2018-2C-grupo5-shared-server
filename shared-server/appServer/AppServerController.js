@@ -1,210 +1,207 @@
-const config = require('../others/Constants'); // get our config file
 const tokenController = require('../auth/TokenController');
 const model = require('./AppServerModels');
 const crypto = require('crypto-js');
 const logger =  require('../others/logger');
+const db = require('./AppServerAccessDB');
+const uuidV1 = require('uuid/v1');
 
 
 
 function getAllServers (req, res, next){
-    var client = req.client;
     var nameFunction = arguments.callee.name;
 
-    client.query("select * FROM server", (err, resp) => {
-        if (err) {
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code: 500, message: err.message});
-        } else {
-            logger.info(__filename,nameFunction,'get all server with succes');
-            res.status(200).send(model.getAllServers(resp));
-            //res.status(200).send(resp.rows);
+    var res_get = db.getAllServers();
+    res_get.then(
+        function(error){
+            res.status(500).json({code: 500, message:'Unexpected error'});
+            logger.error(__filename,nameFunction,error.message);
+        },
+        function(response){
+            res.status(200).send(model.getAllServers(response));
+            logger.info(__filename,nameFunction,'returnning all servers with succes');
         }
-        client.end();
-    })   
+    );
 }
 
 function createServer (req, res, next){
-    var client = req.client;
-    var text = 'INSERT INTO server(createdBy, nameServer,_rev) VALUES($1,$2,$3) RETURNING *';
+    var nameFunction = arguments.callee.name;
+    var data_create = {};
     var createdBy = req.body.createdBy || '';
     var name = req.body.name || '';
-    var nameFunction = arguments.callee.name;
 
+    //validate data input
     if(createdBy == '' || name == ''){
         logger.warn(__filename,nameFunction,'missing parameters to create server');
-        client.end();
         return res.status(400).json({code: 400, message: 'breach of preconditions (missing parameters)'});
     }
 
-    var values = [createdBy,name,'NaN'];
-    client.query(text, values, (err, resp) => {
-        if (err) {
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code: 500, message: err.message});
-            client.end();
-        } else {
-            //create token
-            var server_id = resp.rows[0].server_id;
-            var tokenResponse= tokenController.createToken(server_id);
-            var responseToSend = model.postCreateServer(resp,tokenResponse.token);
+    //create token
+    var server_id = uuidV1();
+    var tokenResponse= tokenController.createToken(server_id);
 
-            text = 'UPDATE server SET jti=$1 Where server_id=$2';
-            values=[tokenResponse.jti,server_id];
-            client.query(text, values, (err, resp) => {
-                if (err) {
-                    logger.error(__filename,nameFunction,err.message);
-                    res.status(500).json({code: 500, message: err.message});
-                } else {
-                    logger.info(__filename,nameFunction,'server created successfully');
-                    res.status(200).send(responseToSend);
-                }
-                client.end();
-            })
+    data_create.server_id = server_id;
+    data_create.jti = tokenResponse.jti;
+    data_create.createdBy = createdBy;
+    data_create.name = name;
+
+    //create server
+    var res_create = db.createServer(data_create);
+    res_create.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message:error.message});
+        },
+        function(response){
+            logger.info(__filename,nameFunction,'server created successfully');
+            res.status(200).send(model.postCreateServer(response,tokenResponse.token));        
         }
-    })
+    );
 }
 
 
 function getSingleServer (req, res, next){
-    var client = req.client;
-    const text = 'SELECT * FROM server WHERE server_id=$1';
     var nameFunction = arguments.callee.name;
-    client.query(text, [req.params.id], (err, resp) => {
-        if (err) {
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code: 500, message: err.message});
-        } else {
-            if(resp.rowCount == 0){
-                logger.warn(__filename,nameFunction,'no exist server');
-                res.status(404).json({code: 404, message:'Servidor inexistente'});
+    var data_get={};
+    var server_id = req.params.id;
+    data_get.server_id = server_id;
+
+    var res_get = db.getSingleServer(data_get);
+    res_get.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message:error.message});
+        },
+        function(response){
+            if(response.rowCount == 0){
+                logger.warn(__filename,nameFunction,'the server: '+server_id+' not exist');
+                res.status(404).json({code: 404, message:'the server not exist'});
             }else{
-                logger.info(__filename,nameFunction,'get server with success ');
-                res.status(200).send(model.getSingleServer(resp));
+                logger.info(__filename,nameFunction,'get server: '+server_id+' with success ');
+                res.status(200).send(model.getSingleServer(response));
             }
         }
-        client.end();
-    })
+    );    
 }
 
-
-/*
-function generate_rev(serverJson, callback){
-    var server = JSON.stringify(serverJson);
-    bcrypt.hash(server,8, function(err,hash) {
-        if(err){
-            callback(err);
-        }
-        else{
-            callback(null,hash);
-        }
-    });
-    
-}
-*/
 
 function updateServer (req, res, next){
-    var client = req.client;
-    var _rev = req.body._rev || '';
-    var name = req.body.name || '';
     var nameFunction = arguments.callee.name;
+    var server_id;
+    var name;
+    var _rev;
 
+    //verify parameters
+    _rev = req.body._rev || '';
+    name = req.body.name || '';
     if(_rev == '' || name == ''){
         logger.warn(__filename,nameFunction,'missing parameteres');
         client.end();
         return res.status(400).json({code: 400, message: 'breach preconditions (missing parameters)'});
     }
 
-    var text = 'SELECT * FROM server WHERE server_id=$1';
-    client.query(text,[req.params.id],(err,resp)=>{
-        if(err){
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code: 500, message:error.message});
-            client.end();            
-        }else{
-            if(resp.rows == ''){
-                logger.warn(__filename,nameFunction,'nonexistent server');
-                res.status(404).json({code: 404, message:'nonexistent server'});
-                client.end();
-            }else{
 
-                if(resp.rows[0]._rev != _rev){
-                    logger.warn(__filename,nameFunction,'Conflict _rev is incorrect');
-                    res.status(409).json({code: 409, message:'Conflict _rev is incorrect'});
-                    client.end();
-                }else{
-                    var hash = crypto.MD5(JSON.stringify(resp.rows[0]));
-                    var new_rev = hash.toString(crypto.enc.hex);
+    //verify if server exist
+    server_id = req.params.id;
+    var data_select={};
+    data_select.server_id = server_id;
+
+    res_select = db.getSingleServer(data_select)
+    res_select.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            return res.status(500).json({code: 500, message:error.message}); 
+        },
+        function(response){
+            if(response.rowCount == 0){
+                logger.warn(__filename,nameFunction,'nonexistent server');
+                return res.status(404).json({code: 404, message:'nonexistent server'});
                 
-                    text = 'UPDATE server SET nameServer=$1, _rev=$2 WHERE server_id=$3 RETURNING *';
-                    client.query(text, [name,new_rev,req.params.id], (err, response) => {
-                        if (err) {
-                            logger.error(__filename,nameFunction,err.message);
-                            res.status(500).json({code: 500, message: err.message});
-                        } else {
-                            logger.info(__filename,nameFunction,'server update with success');
-                            res.status(200).json(model.getSingleServer(response));
-                        }
-                        client.end();
-                    })
-                }
+            }else if(response.rows[0]._rev != _rev){
+                //verify _rev
+                logger.warn(__filename,nameFunction,'Conflict _rev is incorrect');
+                return res.status(409).json({code: 409, message:'Conflict _rev is incorrect'});
+            }else{
+                //obtain new _rev
+                var hash = crypto.MD5(JSON.stringify(response.rows[0]));
+                var new_rev = hash.toString(crypto.enc.hex);
+
+                //update server
+                var data_update={};
+                data_update._rev = new_rev;
+                data_update.name = name;
+                data_update.server_id = server_id;
+
+                res_update = db.updateServer(data_update);
+                res_update.then(
+                    function(error){
+                        logger.error(__filename,nameFunction,error.message);
+                        res.status(500).json({code: 500, message: error.message});
+                    },
+                    function(response){
+                        logger.info(__filename,nameFunction,'server update with success');
+                        res.status(200).json(model.getSingleServer(response));
+                    }
+                );
             }
-    
         }
-    })
+    );
 }
 
 
 /**token was invalidated previously */
 function removeServer (req, res, next){
-    var client = req.client;
-    const text = 'DELETE FROM server WHERE server_id=$1 RETURNING *';
-    var server_id = req.params.id;
     var nameFunction = arguments.callee.name;
-
-    client.query(text, [server_id], (err, resp) => {
-        if (err) {
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code: 500, message: err.message});
-        }else {
-            if(resp.rowCount == 0){
+    var server_id = req.params.id;
+    var data_remove={};
+    data_remove.server_id =server_id;
+    
+    var res_remove = db.removeServer(data_remove);
+    res_remove.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message: error.message});
+        },
+        function(response){
+            if(response.rowCount == 0){
                 logger.warn(__filename,nameFunction,'not exist the requested resource');
-                res.status(410).json({code:404, message:'not exist the requested resource'});
+                res.status(410).json({code:404, message:'not exist server: '+server_id+' to remove'});
             }else{
-                logger.info(__filename,nameFunction,'server was removed with success');                    
-                res.status(203).json({code:203, message:'el registro fue eliminado'});
+                logger.info(__filename,nameFunction,'the server: '+server_id +' was removed successfully');                    
+                res.status(203).json({code:203, message:'the server: '+server_id +' was removed'});
             }
         }
-        client.end();
-    });
+    );
 }
 
 
 /**token was invalidated previously */
 function resetTokenServer (req, res, next){
-
-    var client = req.client;
-    var server_id = req.params.id;
     var nameFunction = arguments.callee.name;
+    var server_id = req.params.id;
 
+    //create token
     var tokenResponse = tokenController.createToken(server_id);
+
     //update jti
-    text = 'UPDATE server SET jti=$1 WHERE server_id=$2 RETURNING *';
-    values = [tokenResponse.jti,server_id];
-    client.query(text,values,(err, resp) => {
-        if(err){
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code:500,message:err.message});                                                   
-        }
-        else{
+    var data_reset={};
+    data_reset.jti = tokenResponse.jti;
+    data_reset.server_id =server_id;
+
+    var res_reset = db.resetTokenServer(data_reset);
+    res_reset.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code:500,message:error.message}); 
+        },
+        function(response){
             logger.info(__filename,nameFunction,'token reset successfully');                                                   
-            res.status(201).send(model.postCreateServer(resp,tokenResponse.token));
+            res.status(201).send(model.postCreateServer(response,tokenResponse.token));
         }
-        client.end();
-    });
+    );
 }
 
 
-
+/*
 function updateLastConnection(req,res,next){
     var client = req.client;
     var server_id = req.id;
@@ -221,47 +218,49 @@ function updateLastConnection(req,res,next){
         }
     })
 }
-
+*/
 
 
 
 
 function removeTrackings (req, res, next){
-    var client = req.client;
-    const text = 'DELETE FROM tracking WHERE server_fk=$1 RETURNING *';
     var server_id = req.params.id;
     var nameFunction = arguments.callee.name;
+    var data_removeTracking={};
+    data_removeTracking.server_id = server_id;
 
-    client.query(text, [server_id], (err, resp) => {
-        if (err) {
-            logger.error(__filename,nameFunction,err.message);
-            client.end();
-            res.status(500).json({code: 500, message:'Unexpected error'});
-        }else {
-            var message = resp.rowCount+' trackings of server:'+server_id+' was removed successfully'
-            logger.info(__filename,nameFunction,message);   
-            next();        
+    res_removeTracking = db.removeTrackings(data_removeTracking);
+    res_removeTracking.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message:error.message});
+        },
+        function(response){
+            var message = response.rowCount+' trackings of server:'+server_id+' was removed successfully'
+            logger.info(__filename,nameFunction,message); 
+            next();  
         }
-    })
+    );
 }
 
 function removePayments (req, res, next){
-    var client = req.client;
-    const text = 'DELETE FROM payment WHERE server_fk=$1 RETURNING *';
     var server_id = req.params.id;
     var nameFunction = arguments.callee.name;
+    var data_removePayments={};
+    data_removePayments.server_id = server_id;
 
-    client.query(text, [server_id], (err, resp) => {
-        if (err) {
-            logger.error(__filename,nameFunction,err.message);
-            client.end();
-            res.status(500).json({code: 500, message:'Unexpected error'});
-        }else {
-            var message = resp.rowCount+' payments of server:'+server_id+' was removed successfully'
+    res_removePayments = db.removePayments(data_removePayments);
+    res_removePayments.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message:error.message});
+        },
+        function(response){
+            var message = response.rowCount+' payments of server:'+server_id+' was removed successfully'
             logger.info(__filename,nameFunction,message);
             next();
         }
-    })
+    );
 }
 
 
@@ -275,5 +274,5 @@ module.exports = {
     resetTokenServer: resetTokenServer,
     removeTrackings:removeTrackings,
     removePayments:removePayments,
-    updateLastConnection:updateLastConnection,
+//    updateLastConnection:updateLastConnection,
 };

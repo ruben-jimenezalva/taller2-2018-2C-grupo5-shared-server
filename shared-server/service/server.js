@@ -2,7 +2,8 @@
 
 const express = require('express');
 const logger = require('../others/logger');
-var AppServer = require('../appServer/AppServer');
+//var AppServer = require('../appServer/AppServer');
+var AppServerDB = require('../appServer/AppServer');
 var Payment = require('../payment/Payment');
 var Tracking = require('../tracking/Tracking');
 
@@ -16,7 +17,8 @@ app.get('/', (req, res) => {
   res.send('Hello World..!');
 });
 
-app.use('/api/servers', AppServer);
+//app.use('/api/servers', AppServer);
+app.use('/api/servers', AppServerDB);
 app.use('/api/payments', Payment);
 app.use('/api/tracking', Tracking);
 

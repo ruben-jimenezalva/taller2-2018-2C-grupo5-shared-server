@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var db = require('./PaymentController');
 var bodyParser = require('body-parser');
-var connect_db = require('../service/Connect');
 var TokenController = require('../auth/TokenController');
 var morgan = require('morgan');
 var logger = require('../others/logger');
@@ -16,12 +15,12 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 //get my payments
-router.get('/',connect_db,TokenController.verifyToken,db.getMyPayments);
+router.get('/',TokenController.verifyToken,db.getMyPayments);
 
 //create a app server
-router.post('/',connect_db,TokenController.verifyToken, db.createPayment);
+router.post('/',TokenController.verifyToken, db.createPayment);
 
 //get sall paymethods
-router.get('/methods',connect_db,TokenController.verifyToken, db.getPaymentMethods);
+router.get('/methods',TokenController.verifyToken, db.getPaymentMethods);
 
 module.exports = router;

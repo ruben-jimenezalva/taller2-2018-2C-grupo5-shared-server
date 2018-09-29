@@ -1,8 +1,9 @@
 const model = require('./PaymentModels');
 const logger =  require('../others/logger');
+var connect = require('../service/Connect');
 
 function getMyPayments (req, res, next){
-    var client = req.client;
+    var client = connect();
     var nameFunction = arguments.callee.name;
     client.query("select * FROM payment WHERE server_fk=$1",[req.id], (err, resp) => {
         if (err) {
@@ -19,7 +20,7 @@ function getMyPayments (req, res, next){
   
 function createPayment (req, res, next){
     var nameFunction = arguments.callee.name;
-    var client = req.client;
+    var client = connect();
     var text1 = "INSERT INTO payment(currency,value,server_fk,expiration_month,expiration_year,method,number,type)";
     var text2 = "VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *";
     var currency = req.body.currency || '';
@@ -46,7 +47,7 @@ function createPayment (req, res, next){
  
 
 function getPaymentMethods (req, res, next){
-    var client = req.client;
+    var client = connect();
     var nameFunction = arguments.callee.name;
     client.query("select * FROM payment", (err, resp) => {
         if (err) {

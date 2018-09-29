@@ -2,7 +2,6 @@ var express = require('express');
 var morgan = require('morgan');
 var router = express.Router();
 var db = require('./TrackingController');
-var connect_db = require('../service/Connect');
 var tokenController = require('../auth/TokenController');
 
 var logger = require('../others/logger');
@@ -17,11 +16,11 @@ router.use(bodyParser.urlencoded({
 
 
 //get single tracking of a particular server
-router.get('/:tracking_id',connect_db,tokenController.verifyToken,db.getInfoTracking);
+router.get('/:tracking_id',tokenController.verifyToken,db.getInfoTracking);
 
 
 //create tracking of a particular server
-router.post('/',connect_db,tokenController.verifyToken,db.createTracking);
+router.post('/',tokenController.verifyToken,db.createTracking);
 
 
 module.exports = router;

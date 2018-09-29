@@ -10,8 +10,8 @@ var newToken;
 var id;
 var _rev;
 var new_rev;
-var dataName = "server&***#$$$$+##++(-)11000";
-var dataCreatedBy = "autor&***$$+##++(-)11000";
+var dataName = "server&***#$$$$+##++(-)11023**2";
+var dataCreatedBy = "autor&***$$+##++(-)1113****2";
 
 chai.use(chaiHttp);
 const url= "http://shared-server:8080";
@@ -83,7 +83,6 @@ describe('get all servers with token',() =>{
 });
 
 
-
 describe('get single server with token',() =>{
     it('should get single server with success',(done) =>{
         chai.request(url)
@@ -97,6 +96,7 @@ describe('get single server with token',() =>{
             });
     });
 });
+
 
 describe('get single server with token',() =>{
     it('should no get single server because id no exists',(done) =>{

@@ -2,50 +2,54 @@
 var config = require('../others/Constants'); // get our config file
 const nJwt = require('njwt');
 const logger =  require('../others/logger');
+const db_token = require('./TokenAccessDB');
+const db_server = require('../appServer/AppServerAccessDB');
 
 function verifyToken(req, res, next) {
+
     // check header or url parameters or post parameters for token
     var token = req.headers['authorization'];
     var nameFunction = arguments.callee.name;
-    var client = req.client;
 
     if (!token){
         logger.warn(__filename,nameFunction,'Unauthorized Access');
-        client.end();
         return res.status(401).send({ code:401, message: 'Unauthorized' });
     }
 
     // verifies secret and checks exp
-    nJwt.verify(token, config.secret, function(err, decoded) { 
+    nJwt.verify(token, config.secret, function(err, decoded) {
         if (err) {
             logger.warn(__filename,nameFunction,'Unauthorized Access');
-            client.end();
             return res.status(401).send({ code:401, message: 'Unauthorized' }); 
         }else{
-            // consult jti in database
-            var jti = decoded.body.jti;
 
-            client.query('SELECT * FROM blackListToken where jti=$1',[jti],(error, resp) => {
-                if(error){
-                    logger.warn(__filename,nameFunction,'Unauthorized Access');
-                    client.end();        
-                    res.status(500).send({ code:500, message: 'Unexpected error' });
-                }
-                else{
-                    if(resp.rowCount != 0){
-                        logger.warn(__filename,nameFunction,'Unauthorized Access');
-                        client.end();        
-                        res.status(401).send({ code:401, message: 'Unauthorized' });
+            // consult jti in database
+            var data_get = {};
+            data_get.jti = decoded.body.jti;
+            var id = decoded.body.id;
+
+            var promise = db_token.getTokensOfBlackList(data_get);
+            promise.then(
+                function (error){
+                    logger.error(__filename,nameFunction,error.message);
+                    res.status(500).send({ code:500, message:error.message });
+                },
+                function(response){
+                    if(response.rowCount != 0){
+                        logger.warn(__filename,nameFunction,'Unauthorized Access to server: '+id);
+                        res.status(401).send({ code:401, message: 'Unauthorized Access' });
                     }
                     else{
-                        logger.info(__filename,nameFunction,'Authorized Access');
-                        req.id = decoded.body.id;
+                        logger.info(__filename,nameFunction,'Authorized Access to server: '+id);
+                        req.id = id;
                         next();
                     }
-                } 
-            });
+                }
+            );
+
         }
     });
+
 }
 
 
@@ -63,55 +67,40 @@ function createToken(server_id) {
 }
 
 
-/*
-function invalidateToken(jti,client) {
-    var nameFunction = arguments.callee.name;
-    client.query('INSERT INTO blackListToken(jti) values($1)',[jti],(error, resp) => {
-        if(error){
-            logger.warn(__filename,nameFunction,'the token could not be disabled');    
-            return -1;
-        }else{
-            logger.info(__filename,nameFunction,'the token was be disabled with success');    
-            return 0;
-        }
-    });
-}
-*/
-
 function invalidateToken(req, res, next) {
     var nameFunction = arguments.callee.name;
-    client = req.client;
 
-    client.query('SELECT jti FROM server where server_id=$1',[req.params.id], (err,resp) =>{
-        if(err){
+    var data_select = {};
+    var server_id =req.params.id;
+    data_select.server_id = server_id;
+    var res_select = db_server.getSingleServer(data_select);
+    res_select.then(
+        function(error){
             logger.error(__filename,nameFunction,err.message);
             res.status(500).json({code: 500, message: err.message});
-            client.end();
-        }else{
-            if(resp){
-                client.query('INSERT INTO blackListToken(jti) values($1)',[resp.rows[0].jti],(error, resp) => {
-                    if(error){
-                        client.end();
-                        logger.warn(__filename,nameFunction,'the token could not be disabled');    
-                    }else{
-                        logger.info(__filename,nameFunction,'the token was be disabled with success'); 
+        },
+        function(response){
+            if(response.rowCount == 0){
+                logger.warn(__filename,nameFunction,'not exist the requested resource');
+                res.status(410).json({code:404, message:'not exist the requested resource'});
+            }else{
+                var data_insert = {};
+                data_insert.jti = response.rows[0].jti;
+                var res_insert = db_token.addTokenBlackList(data_insert);
+                res_insert.then(
+                    function(error){
+                        res.status(410).json({code:404, message:error.message});
+                        logger.warn(__filename,nameFunction,'the token could not be disabled');   
+                    },
+                    function(response){
+                        logger.info(__filename,nameFunction,'the token was be disabled for server: '+server_id+' with success'); 
                         next();
                     }
-                });
-            }else{
-                logger.warn(__filename,nameFunction,'not exist the requested resource');
-                client.end();
-                res.status(410).json({code:404, message:'not exist the requested resource'});
+                );
             }
         }
-    })
+    );
 }
-
-
-
-
-
-
 
 
 module.exports = {
