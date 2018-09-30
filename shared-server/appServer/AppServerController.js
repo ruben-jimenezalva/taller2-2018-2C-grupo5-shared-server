@@ -37,7 +37,7 @@ function createServer (req, res, next){
 
     //create token
     var server_id = uuidV1();
-    var tokenResponse= tokenController.createToken(server_id);
+    var tokenResponse= tokenController.createTokenServer(server_id);
 
     data_create.server_id = server_id;
     data_create.jti = tokenResponse.jti;
@@ -53,7 +53,7 @@ function createServer (req, res, next){
         },
         function(response){
             logger.info(__filename,nameFunction,'server created successfully');
-            res.status(200).send(model.postCreateServer(response,tokenResponse.token));        
+            res.status(201).send(model.postCreateServer(response,tokenResponse.token));        
         }
     );
 }
@@ -180,7 +180,7 @@ function resetTokenServer (req, res, next){
     var server_id = req.params.id;
 
     //create token
-    var tokenResponse = tokenController.createToken(server_id);
+    var tokenResponse = tokenController.createTokenServer(server_id);
 
     //update jti
     var data_reset={};

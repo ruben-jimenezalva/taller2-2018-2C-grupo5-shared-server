@@ -14,13 +14,36 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }));
 
-//get my payments
-router.get('/',TokenController.verifyToken,db.getMyPayments);
-
-//create a app server
+//---   api used by AppServer
+//create payment
 router.post('/',TokenController.verifyToken, db.createPayment);
 
-//get sall paymethods
+
+
+//---   api used by both
+/**
+ * get single payment
+ * return payment if it belongs to AppServer that execute the query
+ * return payment that belongs any Appserver if a Administrator execute the query
+ */
+//router.get('/:id',TokenController.verifyToken, db.getSinglePayment); //-----------> (added)
+
+
+/**
+ * get all payments
+ * return all payments of a AppServer if a AppServer execute the query
+ * return all payments if a Administrator execute execute the query
+ */
+router.get('/',TokenController.verifyToken,db.getMyPayments);
+
+
+/**
+ * get all paymethodsMethods
+ * return all paymentsMethods of a AppServer if a AppServer execute the query
+ * return all paymentsMethods if a Administrator execute execute the query
+ */
 router.get('/methods',TokenController.verifyToken, db.getPaymentMethods);
+
+
 
 module.exports = router;

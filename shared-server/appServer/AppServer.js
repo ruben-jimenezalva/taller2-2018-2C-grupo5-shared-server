@@ -14,22 +14,31 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }));
 
-//get all app servers
-router.get('/',TokenController.verifyToken,db.getAllServers);
+
+//--- api used by AppServer
+
+//reset token of app server
+router.post('/:id',TokenController.invalidateToken,db.resetTokenServer);
 
 //create a app server
 router.post('/', db.createServer);
 
-//get single app server
-router.get('/:id',TokenController.verifyToken, db.getSingleServer);
-
 //update a app server
 router.put('/:id',TokenController.verifyToken,db.updateServer);
+
+
+
+//--- api used by admin
+
+//get all app servers
+router.get('/',TokenController.verifyToken,db.getAllServers);
+
+//get single app server
+router.get('/:id',TokenController.verifyToken, db.getSingleServer);
 
 //delete a app server
 router.delete('/:id',TokenController.verifyToken,db.removePayments,db.removeTrackings,TokenController.invalidateToken, db.removeServer);
 
-//reset token of app server
-router.post('/:id',TokenController.invalidateToken,db.resetTokenServer);
+
 
 module.exports = router;

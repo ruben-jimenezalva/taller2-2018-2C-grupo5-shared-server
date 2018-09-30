@@ -10,8 +10,8 @@ var newToken;
 var id;
 var _rev;
 var new_rev;
-var dataName = "server&***#$$$$+##++(-)11023**2";
-var dataCreatedBy = "autor&***$$+##++(-)1113****2";
+var dataName = "server&***#$$$$+##++(-)11023*-+*2";
+var dataCreatedBy = "autor&***$$+##++(-)1113*-+*2";
 
 chai.use(chaiHttp);
 const url= "http://shared-server:8080";
@@ -59,7 +59,7 @@ describe('create server',() =>{
             .timeout(10000)
             .send({createdBy:dataCreatedBy, name:dataName})
             .end( function (err,res){
-                expect(res).to.have.status(200);
+                expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
                 token = object.server.token.token;
                 id = object.server.server.id;

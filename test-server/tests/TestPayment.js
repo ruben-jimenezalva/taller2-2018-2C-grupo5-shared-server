@@ -4,8 +4,8 @@ const chaiHttp = require('chai-http');
 const expect = require('chai').expect;
 const assert = chai.assert;
 var createdByData = 'someone';
-var nameData = 'test server payment**++$$-##- 1000+**++';
-var nameData2 = 'test server patment**++$$-##- 2000**++';
+var nameData = 'test server payment**++$$-##- 1000+**';
+var nameData2 = 'test server patment**++$$-##- 2000**';
 var token1;
 var token2;
 var id1;
@@ -66,7 +66,7 @@ describe('create server',()=>{
             .post('/api/servers')
             .send({createdBy:createdByData, name:nameData})
             .end(function(err,res){
-                expect(res).to.have.status(200);
+                expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
                 token1 = object.server.token.token;
                 id1 = object.server.server.id;
@@ -81,7 +81,7 @@ describe('create server',()=>{
             .post('/api/servers')
             .send({createdBy:createdByData, name: nameData2})
             .end(function(err,res){
-                expect(res).to.have.status(200);
+                expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
                 token2 = object.server.token.token;
                 id2 = object.server.server.id;

@@ -18,8 +18,7 @@ CREATE TABLE blackListToken (
 
 CREATE TABLE users (
     username VARCHAR(50),
-    password VARCHAR(50) NOT NULL,
-    jti VARCHAR(50),
+    password VARCHAR(64) NOT NULL,
     PRIMARY KEY (username)
 );
 

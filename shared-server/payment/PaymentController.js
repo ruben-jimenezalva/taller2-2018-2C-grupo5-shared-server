@@ -1,65 +1,86 @@
 const model = require('./PaymentModels');
 const logger =  require('../others/logger');
-var connect = require('../service/Connect');
+var db = require('./PaymentAccessDB');
 
 function getMyPayments (req, res, next){
-    var client = connect();
     var nameFunction = arguments.callee.name;
-    client.query("select * FROM payment WHERE server_fk=$1",[req.id], (err, resp) => {
-        if (err) {
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code: 500, message: err.message});
-        } else {
-            res.status(200).send(model.getMyPayments(resp));
-            //res.status(200).send(resp.rows);
-            logger.info(__filename,nameFunction,'get all my payments with success');
+    var res_get;
+    var messageLog;
+
+    if (req.username){
+        var res_get = db.getAllPayments();
+        messageLog = 'get all payments with success for user: '+req.username;
+    }else{
+        var data_get = {};
+        data_get.id = req.id;
+        var res_get = db.getMyPayments(data_get);
+        messageLog = 'get all payments of the server: '+req.id+' with success';
+    }
+
+    res_get.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message: error.message});
+        },
+        function(response){
+            res.status(200).send(model.getMyPayments(response));
+            logger.info(__filename,nameFunction,messageLog);
         }
-        client.end();
-    })   
+    );
 }
   
 function createPayment (req, res, next){
     var nameFunction = arguments.callee.name;
-    var client = connect();
-    var text1 = "INSERT INTO payment(currency,value,server_fk,expiration_month,expiration_year,method,number,type)";
-    var text2 = "VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *";
-    var currency = req.body.currency || '';
-    var value = req.body.value || '';
-    var server_fk = req.id;
-    var expiration_month = req.body.paymentMethod.expiration_month || '';
-    var expiration_year = req.body.paymentMethod.expiration_year || '';
-    var method = req.body.paymentMethod.method || '';
-    var number = req.body.paymentMethod.number || '';
-    var type = req.body.paymentMethod.type || '';
-    values = [currency,value,server_fk,expiration_month,expiration_year,method,number,type];
-    client.query(text1+text2,values, (err, resp) => {
-        if (err) {
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code: 500, message: err.message});
-        } else {
-            res.status(201).send(model.postCreatePayment(resp));
-            //res.status(200).send(resp.rows[0]);
-            logger.info(__filename,nameFunction,'payment created with success');
+    var data_create = {};
+
+    //possible validation
+    data_create.currency = req.body.currency || '';
+    data_create.value = req.body.value || '';
+    data_create.server_fk = req.id;
+    data_create.expiration_month = req.body.paymentMethod.expiration_month || '';
+    data_create.expiration_year = req.body.paymentMethod.expiration_year || '';
+    data_create.method = req.body.paymentMethod.method || '';
+    data_create.number = req.body.paymentMethod.number || '';
+    data_create.type = req.body.paymentMethod.type || '';
+    
+    res_create = db.createPayment(data_create);
+    res_create.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message: error.message});
+        },
+        function(response){
+            res.status(201).send(model.postCreatePayment(response));
+            logger.info(__filename,nameFunction,'payment created by server: '+req.id+' with success');
         }
-        client.end();
-    })   
+    );
 }
  
 
 function getPaymentMethods (req, res, next){
-    var client = connect();
     var nameFunction = arguments.callee.name;
-    client.query("select * FROM payment", (err, resp) => {
-        if (err) {
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code: 500, message: err.message});
-        } else {
-            res.status(200).send(model.getPaymentMethods(resp));
-            //res.status(200).send(resp.rows);
-            logger.info(__filename,nameFunction,'get all paymethods with success');
+    var res_get;
+
+    if (req.username){
+        res_get = db.getAllPaymentMethods();
+        messageLog = 'get all paymentMethods with success for user: '+req.username;
+    }else{
+        var data_get = {};
+        data_get.id = req.id; 
+        res_get = db.getMyPaymentMethods(data_get);
+        messageLog = 'get all paymentMethods with success for server: '+req.id;
+    }
+
+    res_get.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message: error.message});
+        },
+        function(response){
+            res.status(200).send(model.getPaymentMethods(response));
+            logger.info(__filename,nameFunction,messageLog);
         }
-        client.end();
-    })   
+    );  
 }
 
 module.exports = {

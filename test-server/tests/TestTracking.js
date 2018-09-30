@@ -64,7 +64,7 @@ describe('create server 1', ()=>{
             .post('/api/servers')
             .send({createdBy:createdByData, name:nameServer1})
             .end( function(err,res){
-                expect(res).to.have.status(200);
+                expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
                 token1 = object.server.token.token;
                 id_server1 = object.server.server.id;
@@ -80,7 +80,7 @@ describe('create server 2', ()=>{
             .post('/api/servers')
             .send({createdBy:createdByData, name:nameServer2})
             .end( function(err,res){
-                expect(res).to.have.status(200);
+                expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
                 token2 = object.server.token.token;
                 id_server2 = object.server.server.id;

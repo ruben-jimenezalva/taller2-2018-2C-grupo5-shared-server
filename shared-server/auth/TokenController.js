@@ -6,7 +6,7 @@ const db_token = require('./TokenAccessDB');
 const db_server = require('../appServer/AppServerAccessDB');
 
 function verifyToken(req, res, next) {
-
+    
     // check header or url parameters or post parameters for token
     var token = req.headers['authorization'];
     var nameFunction = arguments.callee.name;
@@ -22,31 +22,37 @@ function verifyToken(req, res, next) {
             logger.warn(__filename,nameFunction,'Unauthorized Access');
             return res.status(401).send({ code:401, message: 'Unauthorized' }); 
         }else{
-
-            // consult jti in database
-            var data_get = {};
-            data_get.jti = decoded.body.jti;
-            var id = decoded.body.id;
-
-            var promise = db_token.getTokensOfBlackList(data_get);
-            promise.then(
-                function (error){
-                    logger.error(__filename,nameFunction,error.message);
-                    res.status(500).send({ code:500, message:error.message });
-                },
-                function(response){
-                    if(response.rowCount != 0){
-                        logger.warn(__filename,nameFunction,'Unauthorized Access to server: '+id);
-                        res.status(401).send({ code:401, message: 'Unauthorized Access' });
+            //if is admin
+            if(decoded.body.username){
+                logger.info(__filename,nameFunction,'Authorized Access to Admin: '+decoded.username);
+                req.username = decoded.body.username; //save because it can be used to data access
+                next();
+            }else{
+                //else is appserver
+                var data_get = {};
+                data_get.jti = decoded.body.jti;
+                var id = decoded.body.id;
+                // consult jti in database
+                var nameFunction = arguments.callee.name;
+                var promise = db_token.getTokensOfBlackList(data_get);
+                promise.then(
+                    function (error){
+                        logger.error(__filename,nameFunction,error.message);
+                        res.status(500).send({ code:500, message:error.message });
+                    },
+                    function(response){
+                        if(response.rowCount != 0){
+                            logger.warn(__filename,nameFunction,'Unauthorized Access to server: '+id);
+                            res.status(401).send({ code:401, message: 'Unauthorized Access' });
+                        }
+                        else{
+                            logger.info(__filename,nameFunction,'Authorized Access to server: '+id);
+                            req.id = id; //save because it can be used to data access
+                            next();
+                        }
                     }
-                    else{
-                        logger.info(__filename,nameFunction,'Authorized Access to server: '+id);
-                        req.id = id;
-                        next();
-                    }
-                }
-            );
-
+                );
+            }
         }
     });
 
@@ -54,16 +60,27 @@ function verifyToken(req, res, next) {
 
 
 //{id:server_id, currentTime: Date.now() };
-
-function createToken(server_id) {
+function createTokenServer(server_id) {
     var nameFunction = arguments.callee.name;
     var payload = {id:server_id, currentTime: Date.now() };
     var jwt = nJwt.create(payload,config.secret);
     jwt.setExpiration(new Date().getTime() + config.expireTime);
     var token = jwt.compact();
     var response={token:token, jti:jwt.body.jti};
-    logger.info(__filename,nameFunction,'token created successfully');    
+    logger.info(__filename,nameFunction,'token for Server created successfully');    
     return response;
+}
+
+
+function createTokenAdmin(username) {
+    var nameFunction = arguments.callee.name;
+    var payload = {username:username, currentTime: Date.now() };
+    var jwt = nJwt.create(payload,config.secret);
+    jwt.setExpiration(new Date().getTime() + config.expireTime);
+    var token = jwt.compact();
+    //var response={token:token, jti:jwt.body.jti};
+    logger.info(__filename,nameFunction,'token for Admin created successfully');    
+    return token;
 }
 
 
@@ -105,6 +122,7 @@ function invalidateToken(req, res, next) {
 
 module.exports = {
     verifyToken: verifyToken,
-    createToken: createToken,
+    createTokenServer: createTokenServer,
+    createTokenAdmin:createTokenAdmin,
     invalidateToken: invalidateToken
 };
