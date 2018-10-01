@@ -77,53 +77,6 @@ function createPayment (data){
     return promise;
 }
 
-/*
-function getMySinglePayment (data){
-    var client = connect();
-    var nameFunction = arguments.callee.name;
-    var text = "select * FROM payment WHERE server_fk=$1 and transaction_id=$2";
-
-    var promise = new Promise(function(reject,resolve){
-        client.query(text,[data.id,data.transaction_id], (error, response) => {
-            if (error) {
-                logger.error(__filename,nameFunction,error);
-                reject(error)
-            } else {
-                var message = 'query get my single payment of the server: '+data.id+' executed with success';
-                logger.info(__filename,nameFunction,message);
-                resolve(response);
-            }
-            client.end();
-        });   
-    });
-
-    return promise;
-}
-
-
-function getSinglePayment (data){
-    var client = connect();
-    var nameFunction = arguments.callee.name;
-    var text = "select * FROM payment WHERE transaction_id=$1";
-
-    var promise = new Promise(function(reject,resolve){
-        client.query(text, [data.transaction_id], (error, response) => {
-            if (error) {
-                logger.error(__filename,nameFunction,error);
-                reject(error)
-            } else {
-                logger.info(__filename,nameFunction,'query get Single payment executed with success');
-                resolve(response);
-            }
-            client.end();
-        });   
-    });
-
-    return promise;
-}
-*/
-
-
 function getAllPaymentMethods (){
     var client = connect();
     var nameFunction = arguments.callee.name;
@@ -166,12 +119,67 @@ function getMyPaymentMethods (data){
 }
 
 
+/**
+ * methods added
+ * return single payment of the particular server
+ * @param {Object} data 
+ */
+function getMySinglePayment (data){
+    var client = connect();
+    var nameFunction = arguments.callee.name;
+    var text = "select * FROM payment WHERE server_fk=$1 and transaction_id=$2";
+
+    var promise = new Promise(function(reject,resolve){
+        client.query(text,[data.server_fk,data.transaction_id], (error, response) => {
+            if (error) {
+                logger.error(__filename,nameFunction,error);
+                reject(error)
+            } else {
+                var message = 'query get my single payment of the server: '+data.id+' executed with success';
+                logger.info(__filename,nameFunction,message);
+                resolve(response);
+            }
+            client.end();
+        });   
+    });
+
+    return promise;
+}
+
+
+/**
+ * methods added
+ * return single payment of any server
+ * @param {Object} data 
+ */
+function getSinglePayment (data){
+    var client = connect();
+    var nameFunction = arguments.callee.name;
+    var text = "select * FROM payment WHERE transaction_id=$1";
+
+    var promise = new Promise(function(reject,resolve){
+        client.query(text, [data.transaction_id], (error, response) => {
+            if (error) {
+                logger.error(__filename,nameFunction,error);
+                reject(error)
+            } else {
+                logger.info(__filename,nameFunction,'query get Single payment executed with success');
+                resolve(response);
+            }
+            client.end();
+        });   
+    });
+
+    return promise;
+}
+
+
 module.exports = {
     getMyPayments: getMyPayments,
     getAllPayments:getAllPayments,
     createPayment: createPayment,
-//    getMySinglePayment:getMySinglePayment,
-//    getSinglePayment:getSinglePayment,
     getAllPaymentMethods:getAllPaymentMethods,
-    getMyPaymentMethods:getMyPaymentMethods
+    getMyPaymentMethods:getMyPaymentMethods,
+    getMySinglePayment:getMySinglePayment,  //method added
+    getSinglePayment:getSinglePayment       //method added
 };

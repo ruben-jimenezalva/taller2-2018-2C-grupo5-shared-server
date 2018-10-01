@@ -83,8 +83,50 @@ function getPaymentMethods (req, res, next){
     );  
 }
 
+
+
+/**
+ * method added
+ */
+function getSinglePayment (req, res, next){
+    var nameFunction = arguments.callee.name;
+    var res_get;
+    var messageLog;
+    var data_get = {};
+    data_get.transaction_id = req.params.transaction_id;
+
+    if (req.username){
+        var res_get = db.getSinglePayment(data_get);
+        messageLog = 'get single payment with success for user: '+req.username;
+    }else{
+        data_get.server_fk = req.id;
+        var res_get = db.getMySinglePayment(data_get);
+        messageLog = 'get single payment of the server: '+req.id+' with success';
+    }
+
+    res_get.then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message: error.message});
+        },
+        function(response){
+            if(response.rowCount == 0){
+                logger.warn(__filename,nameFunction,'not exists payment: '+data_get.transaction_id);
+                res.status(404).json({code:404, message:'not exists payment'});
+            }else{
+                logger.info(__filename,nameFunction,messageLog);
+                res.status(200).send(model.getSinglePayment(response));
+            }
+        }
+    );
+}
+
+
+
+
 module.exports = {
     getMyPayments: getMyPayments,
     createPayment: createPayment,
     getPaymentMethods: getPaymentMethods,
+    getSinglePayment:getSinglePayment       //method added
 };

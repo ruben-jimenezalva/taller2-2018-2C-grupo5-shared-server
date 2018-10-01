@@ -19,6 +19,24 @@ function getMyPayments(res){
 }
 
 
+function getSinglePayment(res){
+    var payment = {
+        "transaction_id" : res.rows[0].transaction_id,
+        "currency" : res.rows[0].currency,
+        "value" : res.rows[0].value,
+        "paymentMethod" : {
+            "epiration_month" : res.rows[0].epiration_month,
+            "expiration_year" : res.rows[0].expiration_year,
+            "number" : res.rows[0].number,
+            "method" : res.rows[0].method,
+            "type" : res.rows[0].type
+        },
+    };
+
+    return payment;
+}
+
+
 function postCreatePayment(res){
     var payment = {
         "transaction_id" : res.rows[0].transaction_id,
@@ -52,5 +70,6 @@ function getPaymentMethods(res){
 module.exports = {
     getMyPayments: getMyPayments,
     postCreatePayment: postCreatePayment,
-    getPaymentMethods: getPaymentMethods
+    getPaymentMethods: getPaymentMethods,
+    getSinglePayment:getSinglePayment
 };

@@ -24,6 +24,8 @@ var dataName_2 = 'sever-------2'+ Math.random()*1000000000;
 var transaction_id_server1;
 var transaction_id_server2;
 
+var method1_server_1 = 'method 2_server1--' + Math.random()*10000000000;
+var method1_server_2 = 'method 1_server2--' + Math.random()*10000000000;
 
 
 describe('TEST',() =>{
@@ -110,7 +112,7 @@ describe('test create payment for server 1', ()=>{
                     "paymentMethod":{
                         "expiration_month":"8",
                         "expiration_year":"2020",
-                        "method":"credit",
+                        "method":method1_server_1,
                         "number":"----",
                         "type":"-----"
                     }
@@ -136,7 +138,7 @@ describe('test create payment for server 2', ()=>{
                     "paymentMethod":{
                         "expiration_month":"8",
                         "expiration_year":"2020",
-                        "method":"credit",
+                        "method":method1_server_2,
                         "number":"----",
                         "type":"-----"
                     }
@@ -152,37 +154,6 @@ describe('test create payment for server 2', ()=>{
 });
 
 //-------------------------------------------------
-
-describe('get payments of the server 1',()=>{
-    it('should it have 1 payments ',(done)=>{
-        chai.request(url)
-            .get('/api/payments')
-            .set({authorization:token_server_1})
-            .end(function(err,res){
-                expect(res).to.have.status(200);
-                var object = JSON.parse(res.text);
-                assert.equal(object.length,1);
-                done();
-            });
-    });
-});
-
-
-describe('get payments of the server 2',()=>{
-    it('should it have 1 payment',(done)=>{
-        chai.request(url)
-            .get('/api/payments')
-            .set({'authorization':token_server_2})
-            .end(function(err,res){
-                expect(res).to.have.status(200);
-                var object = JSON.parse(res.text);
-                assert.equal(object.length,1);
-                done();
-            });
-    });
-});
-
-
 
 describe('get all payments of all the servers',()=>{
     it('should it obtain all payments but the transactions searched not exists',(done)=>{
@@ -214,7 +185,57 @@ describe('get all payments of all the servers',()=>{
     });
 });
 
-//-------------------------------------------------------
+
+
+
+
+//################TEST ADDED######################
+
+describe('get single payment_1_server1 of the server 1',()=>{
+    it('should obtain the payment_1_server1 successfully because query is executed by admin',(done)=>{
+        chai.request(url)
+            .get('/api/payments/'+ transaction_id_server1)
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                var object = JSON.parse(res.text);
+                assert.equal(object.transaction_id,transaction_id_server1);
+                done();
+            });
+    });
+});
+
+describe('get single payment_1_server2 of the server 2',()=>{
+    it('should obtain the payment_1_server2 successfully because query is executed by admin',(done)=>{
+        chai.request(url)
+            .get('/api/payments/'+ transaction_id_server2)
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                var object = JSON.parse(res.text);
+                assert.equal(object.transaction_id,transaction_id_server2);
+                done();
+            });
+    });
+});
+
+
+describe('get all paymethods of all servers',()=>{
+    it('should obtain all paymethods successfully because the query is executed by admin',(done)=>{
+        chai.request(url)
+            .get('/api/payments/methods')
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                assert.match(res.text,new RegExp(method1_server_1),'regexp matches');
+                assert.match(res.text,new RegExp(method1_server_2),'regexp matches');
+                done();
+            });
+    });
+});
+
+//################################################
+
 
 describe('delete server 1',() =>{
     it('should delete single server with success',(done) =>{
@@ -242,7 +263,7 @@ describe('delete server 2',() =>{
 
 //------------------------------------------------------
 
-describe('get all payments of all the servers',()=>{
+describe('get all payments of all servers',()=>{
     it('should it obtain all payments but transactions searched not exists because were deleted',(done)=>{
         chai.request(url)
             .get('/api/payments')
@@ -251,6 +272,47 @@ describe('get all payments of all the servers',()=>{
                 expect(res).to.have.status(200);
                 assert.notMatch(res.text.toString(),new RegExp(transaction_id_server1),'regexp matches');
                 assert.notMatch(res.text.toString(),new RegExp(transaction_id_server2),'regexp matches');
+                done();
+            });
+    });
+});
+
+
+describe('get single payment of the server_1',()=>{
+    it('should it fail because server 1 was deleted',(done)=>{
+        chai.request(url)
+            .get('/api/payments/'+transaction_id_server1)
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(404);
+                done();
+            });
+    });
+});
+
+describe('get single payment of the server_2',()=>{
+    it('should it fail because server 2 was deleted',(done)=>{
+        chai.request(url)
+            .get('/api/payments/'+transaction_id_server2)
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(404);
+                done();
+            });
+    });
+});
+
+
+
+describe('get all paymethods of all servers',()=>{
+    it('should it obtain all paymethods but methods searched not exists because were deleted',(done)=>{
+        chai.request(url)
+            .get('/api/payments/methods')
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                assert.notMatch(res.text.toString(),new RegExp(method1_server_1),'regexp matches');
+                assert.notMatch(res.text.toString(),new RegExp(method1_server_2),'regexp matches');
                 done();
             });
     });

@@ -21,13 +21,6 @@ router.post('/',TokenController.verifyToken, db.createPayment);
 
 
 //---   api used by both
-/**
- * get single payment
- * return payment if it belongs to AppServer that execute the query
- * return payment that belongs any Appserver if a Administrator execute the query
- */
-//router.get('/:id',TokenController.verifyToken, db.getSinglePayment); //-----------> (added)
-
 
 /**
  * get all payments
@@ -36,7 +29,6 @@ router.post('/',TokenController.verifyToken, db.createPayment);
  */
 router.get('/',TokenController.verifyToken,db.getMyPayments);
 
-
 /**
  * get all paymethodsMethods
  * return all paymentsMethods of a AppServer if a AppServer execute the query
@@ -44,6 +36,11 @@ router.get('/',TokenController.verifyToken,db.getMyPayments);
  */
 router.get('/methods',TokenController.verifyToken, db.getPaymentMethods);
 
-
+/**
+ * get single payment
+ * return payment if it belongs to AppServer that execute the query
+ * return payment that belongs any Appserver if a Administrator execute the query
+ */
+router.get('/:transaction_id',TokenController.verifyToken, db.getSinglePayment); //-----------> (added)
 
 module.exports = router;
