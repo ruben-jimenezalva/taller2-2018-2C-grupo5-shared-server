@@ -8,8 +8,8 @@ function getInfoTracking(res){
     return tracking;
 }
 
-/*
-function getTrackigs(res){
+
+function getAllTrackigs(res){
     var trackings = [];
     for(i=0;i < res.rowCount;i++){
         var tracking = {
@@ -21,8 +21,9 @@ function getTrackigs(res){
     }
     return trackings;
 }
-*/
+
 
 module.exports = {
     getInfoTracking: getInfoTracking,
+    getAllTrackigs:getAllTrackigs
 };

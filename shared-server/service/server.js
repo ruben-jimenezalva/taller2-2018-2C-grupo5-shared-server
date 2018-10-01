@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/servers', AppServer);
 app.use('/api/payments', Payment);
-app.use('/api/tracking', Tracking);
+app.use('/api/trackings', Tracking);
 app.use('/api/user', User);
 
 app.listen(PORT, () =>{

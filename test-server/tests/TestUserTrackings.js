@@ -104,7 +104,7 @@ describe('test create server_2', ()=>{
 describe('create tracking for server 1', ()=>{
     it('should create tracking succesfully', (done)=>{
         chai.request(url)
-            .post('/api/tracking')
+            .post('/api/trackings')
             .set({authorization:token_server_1})
             .send({status:'created'})
             .end( function(err,res){
@@ -120,7 +120,7 @@ describe('create tracking for server 1', ()=>{
 describe('create tracking for server 2', ()=>{
     it('should create tracking succesfully', (done)=>{
         chai.request(url)
-            .post('/api/tracking')
+            .post('/api/trackings')
             .set({authorization:token_server_2})
             .send({status:'created'})
             .end( function(err,res){
@@ -137,7 +137,7 @@ describe('create tracking for server 2', ()=>{
 describe('get single tracking of the server 1',()=>{
     it('should obtain tracking successfully',(done)=>{
         chai.request(url)
-            .get('/api/tracking/'+ id_tracking1_server1)
+            .get('/api/trackings/'+ id_tracking1_server1)
             .set({authorization:token_server_1})
             .end(function(err,res){
                 expect(res).to.have.status(200);
@@ -152,7 +152,7 @@ describe('get single tracking of the server 1',()=>{
 describe('get single tracking of the server 2',()=>{
     it('should obtain tracking successfully',(done)=>{
         chai.request(url)
-            .get('/api/tracking/'+id_tracking1_server2)
+            .get('/api/trackings/'+id_tracking1_server2)
             .set({'authorization':token_server_2})
             .end(function(err,res){
                 expect(res).to.have.status(200);
@@ -169,7 +169,7 @@ describe('get single tracking of the server 2',()=>{
 describe('get single tracking of the server2 in server 1',()=>{
     it('should fail because server1 no contain that tracking',(done)=>{
         chai.request(url)
-            .get('/api/tracking/'+ id_tracking1_server2)
+            .get('/api/trackings/'+ id_tracking1_server2)
             .set({authorization:token_server_1})
             .end(function(err,res){
                 expect(res).to.have.status(404);
@@ -184,7 +184,7 @@ describe('get single tracking of the server2 in server 1',()=>{
 describe('get single tracking of the server1 in server 2',()=>{
     it('should fail because server2 no contain that tracking',(done)=>{
         chai.request(url)
-            .get('/api/tracking/'+id_tracking1_server1)
+            .get('/api/trackings/'+id_tracking1_server1)
             .set({'authorization':token_server_2})
             .end(function(err,res){
                 expect(res).to.have.status(404);
@@ -202,7 +202,7 @@ describe('get single tracking of the server1 in server 2',()=>{
 describe('get single tracking of the server2 by the admin',()=>{
     it('should obtain succesfully because admin can obtain all trackings',(done)=>{
         chai.request(url)
-            .get('/api/tracking/'+ id_tracking1_server2)
+            .get('/api/trackings/'+ id_tracking1_server2)
             .set({authorization:tokenUser})
             .end(function(err,res){
                 expect(res).to.have.status(200);
@@ -217,7 +217,7 @@ describe('get single tracking of the server2 by the admin',()=>{
 describe('get single tracking of the server1 by the admin',()=>{
     it('should obtain succesfully because admin can obtain all trackings',(done)=>{
         chai.request(url)
-            .get('/api/tracking/'+id_tracking1_server1)
+            .get('/api/trackings/'+id_tracking1_server1)
             .set({'authorization':tokenUser})
             .end(function(err,res){
                 expect(res).to.have.status(200);
@@ -228,7 +228,41 @@ describe('get single tracking of the server1 by the admin',()=>{
     });
 });
 
-//------------------------------------------------------
+
+
+//#####################ADDED###########################
+
+
+describe('get all trackings of all the servers',()=>{
+    it('should it obtain all trackings and trackings searched exists',(done)=>{
+        chai.request(url)
+            .get('/api/trackings')
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                assert.match(res.text,new RegExp(id_tracking1_server1),'regexp matches');
+                assert.match(res.text,new RegExp(id_tracking1_server2),'regexp matches');
+                done();
+            });
+    });
+});
+
+describe('get all trackings of all the servers',()=>{
+    it('should it obtain all trackings and trackings searched not exists',(done)=>{
+        chai.request(url)
+            .get('/api/trackings')
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                assert.notMatch(res.text,new RegExp(id_tracking1_server1+'q'),'regexp matches');
+                assert.notMatch(res.text,new RegExp(id_tracking1_server2+'q'),'regexp matches');
+                done();
+            });
+    });
+});
+
+
+//#####################################################
 
 
 describe('delete server 1',() =>{
@@ -261,7 +295,7 @@ describe('delete server 2',() =>{
 describe('get single tracking of the server2 by the admin',()=>{
     it('should fail because the trackings of the server2 were deleted',(done)=>{
         chai.request(url)
-            .get('/api/tracking/'+ id_tracking1_server2)
+            .get('/api/trackings/'+ id_tracking1_server2)
             .set({authorization:tokenUser})
             .end(function(err,res){
                 expect(res).to.have.status(404);
@@ -276,7 +310,7 @@ describe('get single tracking of the server2 by the admin',()=>{
 describe('get single tracking of the server1 by the admin',()=>{
     it('should fail because the trackings of the server1 were deleted',(done)=>{
         chai.request(url)
-            .get('/api/tracking/'+id_tracking1_server1)
+            .get('/api/trackings/'+id_tracking1_server1)
             .set({'authorization':tokenUser})
             .end(function(err,res){
                 expect(res).to.have.status(404);
@@ -287,86 +321,20 @@ describe('get single tracking of the server1 by the admin',()=>{
     });
 });
 
-//------------------------------------------------------
 
-
-//-------------------------------------------------
-
-/*
-describe('get trackings of the server 1',()=>{
-    it('should it have 1 trackings ',(done)=>{
-        chai.request(url)
-            .get('/api/tracking')
-            .set({authorization:token_server_1})
-            .end(function(err,res){
-                expect(res).to.have.status(200);
-                var object = JSON.parse(res.text);
-                assert.equal(object.length,1);
-                done();
-            });
-    });
-});
-
-
-describe('get trackings of the server 2',()=>{
-    it('should it have 1 trackings',(done)=>{
-        chai.request(url)
-            .get('/api/tracking')
-            .set({'authorization':token_server_2})
-            .end(function(err,res){
-                expect(res).to.have.status(200);
-                var object = JSON.parse(res.text);
-                assert.equal(object.length,1);
-                done();
-            });
-    });
-});
-
-
-
-describe('get all trackings of all the servers',()=>{
-    it('should it obtain all trackings but the trackings searched not exists',(done)=>{
-        chai.request(url)
-            .get('/api/tracking')
-            .set({'authorization':tokenUser})
-            .end(function(err,res){
-                expect(res).to.have.status(200);
-                assert.notMatch(res.text,new RegExp(id_tracking1_server1+'q'),'regexp not matches');
-                assert.notMatch(res.text,new RegExp(id_tracking1_server2+'q'),'regexp not matches');
-                done();
-            });
-    });
-});
-
-
-
-describe('get all trackings of all the servers',()=>{
-    it('should it obtain all trackings and trackings searched exists',(done)=>{
-        chai.request(url)
-            .get('/api/tracking')
-            .set({'authorization':tokenUser})
-            .end(function(err,res){
-                expect(res).to.have.status(200);
-                assert.match(res.text.toString(),new RegExp(id_tracking1_server1),'regexp matches');
-                assert.match(res.text.toString(),new RegExp(id_tracking1_server2),'regexp matches');
-                done();
-            });
-    });
-});
-
-//-------------------------------------------------------
+//#####################ADDED###########################
 
 describe('get all trackings of all the servers',()=>{
     it('should it obtain all trackings but trackings searched not exists because were deleted',(done)=>{
         chai.request(url)
-            .get('/api/tracking')
+            .get('/api/trackings')
             .set({'authorization':tokenUser})
             .end(function(err,res){
                 expect(res).to.have.status(200);
-                assert.notMatch(res.text.toString(),new RegExp(id_tracking1_server1),'regexp matches');
-                assert.notMatch(res.text.toString(),new RegExp(id_tracking1_server2),'regexp matches');
+                assert.notMatch(res.text,new RegExp(id_tracking1_server1),'regexp matches');
+                assert.notMatch(res.text,new RegExp(id_tracking1_server2),'regexp matches');
                 done();
             });
     });
 });
-*/
+//#####################ADDED###########################

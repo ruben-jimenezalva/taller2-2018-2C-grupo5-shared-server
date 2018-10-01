@@ -55,8 +55,44 @@ function getInfoTracking (req, res, next){
     );
 }
 
+
+
+/**
+ * Method added
+ * return all trackings of the AppServer that execute the query
+ * return all trackings of all AppServers if a Administrator execute the query
+ */
+function getAllTrackings (req, res, next){
+    var nameFunction = arguments.callee.name;
+    var res_get;
+    var messageLog;
+
+    if(req.username){
+        messageLog = 'get all trackings successfully by admin: '+req.username;
+        res_get = db.getAllTrackings();
+    }else{
+        var data_get = {};
+        data_get.server_fk = req.id;
+        messageLog = 'get all trackings of the server: '+req.id+ ' successfully';
+        res_get = db.getMyTrackings(data_get);
+    }
+
+    res_get.then(
+        function(error){
+            res.status(500).json({code:500, message:error.message});
+            logger.error(__filename,nameFunction,error.message);
+        },
+        function(response){
+            res.status(200).send(model.getAllTrackigs(response));
+            logger.info(__filename,nameFunction,messageLog);
+        }
+    );
+}
+
+
 module.exports = {
     createTracking: createTracking,
-    getInfoTracking: getInfoTracking
+    getInfoTracking: getInfoTracking,
+    getAllTrackings:getAllTrackings
 };
   

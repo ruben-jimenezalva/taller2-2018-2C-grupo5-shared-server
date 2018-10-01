@@ -35,9 +35,9 @@ router.get('/:tracking_id',tokenController.verifyToken,db.getInfoTracking);
 /**
  * get all trackings
  * return all trackings of the AppServer that execute the query
- * return all trackings of any AppServer if a Administrator execute the query
+ * return all trackings of all AppServers if a Administrator execute the query
  */
-//router.get('/',tokenController.verifyToken,db.createTracking);//-------------> (added)
+router.get('/',tokenController.verifyToken,db.getAllTrackings);//-------------> (added)
 
 
 module.exports = router;

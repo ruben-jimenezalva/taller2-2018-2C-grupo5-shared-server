@@ -82,9 +82,70 @@ function getTracking (data){
     return promise;
 }
 
+
+
+
+
+/**
+ * added
+ * return all trackings of a particular server
+ * @param {Object} data 
+ */
+function getMyTrackings (data){
+    var client = connect();
+    var nameFunction = arguments.callee.name;
+    var text = 'SELECT * FROM tracking WHERE server_fk=$1';
+
+    var promise =  new Promise(function(reject,resolve){
+        client.query(text,[data.server_fk],(error,response) =>{
+            if(error){
+                logger.error(__filename,nameFunction,error);
+                reject(error);
+            }else{
+                logger.info(__filename,nameFunction,'query get alls trackings of the server: '+data.server_fk+' executed successfully');
+                resolve(response);
+            }
+            client.end();
+        });
+    });
+
+    return promise;
+}
+
+
+/**
+ * added
+ * return all trackings of all servers
+ */
+function getAllTrackings (){
+    var client = connect();
+    var nameFunction = arguments.callee.name;
+    var text = 'SELECT * FROM tracking';
+
+    var promise =  new Promise(function(reject,resolve){
+        client.query(text,(error,response) =>{
+            if(error){
+                logger.error(__filename,nameFunction,error);
+                reject(error);
+            }else{
+                logger.info(__filename,nameFunction,'query get alls trackings of all servers executed successfully');
+                resolve(response);
+            }
+            client.end();
+        });
+    });
+
+    return promise;
+}
+
+
+
+
 module.exports = {
     createTracking: createTracking,
     getInfoMyTracking: getInfoMyTracking,
-    getTracking:getTracking
+    getTracking:getTracking,
+    getMyTrackings:getMyTrackings,
+    getAllTrackings:getAllTrackings
 };
   

@@ -8,8 +8,8 @@ chai.use(chaiHttp);
 var id_tracking = 'aaaaaaaa-bbbb-cccc-dddd-0242ac140002';
 var url = 'http://shared-server:8080'
 
-var token1;
-var token2;
+var token_server1;
+var token_server2;
 var id_server1;
 var id_server2;
 var id_tracking1_server1;
@@ -34,7 +34,7 @@ describe('TEST',() =>{
 describe('create tracking', ()=>{
     it('should fail create tracking because it no authorized', (done)=>{
         chai.request(url)
-            .post('/api/tracking')
+            .post('/api/trackings')
             .set({authorization:'dsadddd'})
             .end( function(err,res){
                 expect(res).to.have.status(401);
@@ -47,7 +47,7 @@ describe('create tracking', ()=>{
 describe('get tracking', ()=>{
     it('should fail get tracking because it no authorized', (done)=>{
         chai.request(url)
-            .get('/api/tracking/' +id_tracking)
+            .get('/api/trackings/' +id_tracking)
             .set({authorization:'dsadddd'})
             .end( function(err,res){
                 expect(res).to.have.status(401);
@@ -66,7 +66,7 @@ describe('create server 1', ()=>{
             .end( function(err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
-                token1 = object.server.token.token;
+                token_server1 = object.server.token.token;
                 id_server1 = object.server.server.id;
                 done();
             });
@@ -82,7 +82,7 @@ describe('create server 2', ()=>{
             .end( function(err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
-                token2 = object.server.token.token;
+                token_server2 = object.server.token.token;
                 id_server2 = object.server.server.id;
                 done();
             });
@@ -95,8 +95,8 @@ describe('create server 2', ()=>{
 describe('create tracking for server 1', ()=>{
     it('should create tracking succesfully', (done)=>{
         chai.request(url)
-            .post('/api/tracking')
-            .set({authorization:token1})
+            .post('/api/trackings')
+            .set({authorization:token_server1})
             .send({status:'created'})
             .end( function(err,res){
                 expect(res).to.have.status(201);
@@ -111,8 +111,8 @@ describe('create tracking for server 1', ()=>{
 describe('create tracking for server 1', ()=>{
     it('should create tracking succesfully', (done)=>{
         chai.request(url)
-            .post('/api/tracking')
-            .set({authorization:token1})
+            .post('/api/trackings')
+            .set({authorization:token_server1})
             .send({status:'created'})
             .end( function(err,res){
                 expect(res).to.have.status(201);
@@ -126,8 +126,8 @@ describe('create tracking for server 1', ()=>{
 describe('create tracking for server 2', ()=>{
     it('should create tracking succesfully', (done)=>{
         chai.request(url)
-            .post('/api/tracking')
-            .set({authorization:token2})
+            .post('/api/trackings')
+            .set({authorization:token_server2})
             .send({status:'created'})
             .end( function(err,res){
                 expect(res).to.have.status(201);
@@ -143,8 +143,8 @@ describe('create tracking for server 2', ()=>{
 describe('get tracking 1 for server 1', ()=>{
     it('should obtain tracking successfully', (done)=>{
         chai.request(url)
-            .get('/api/tracking/' +id_tracking1_server1)
-            .set({authorization:token1})
+            .get('/api/trackings/' +id_tracking1_server1)
+            .set({authorization:token_server1})
             .end( function(err,res){
                 expect(res).to.have.status(200);
                 var object = JSON.parse(res.text);
@@ -158,8 +158,8 @@ describe('get tracking 1 for server 1', ()=>{
 describe('get tracking 2 for server 1', ()=>{
     it('should obtain tracking successfully', (done)=>{
         chai.request(url)
-            .get('/api/tracking/' +id_tracking2_server1)
-            .set({authorization:token1})
+            .get('/api/trackings/' +id_tracking2_server1)
+            .set({authorization:token_server1})
             .end( function(err,res){
                 expect(res).to.have.status(200);
                 var object = JSON.parse(res.text);
@@ -173,8 +173,8 @@ describe('get tracking 2 for server 1', ()=>{
 describe('get tracking 1 for server 2 ', ()=>{
     it('should obtain tracking successfully', (done)=>{
         chai.request(url)
-            .get('/api/tracking/' +id_tracking1_server2)
-            .set({authorization:token2})
+            .get('/api/trackings/' +id_tracking1_server2)
+            .set({authorization:token_server2})
             .end( function(err,res){
                 expect(res).to.have.status(200);
                 var object = JSON.parse(res.text);
@@ -189,8 +189,8 @@ describe('get tracking 1 for server 2 ', ()=>{
 describe('get tracking 1 of server 1 in server 2 ', ()=>{
     it('should fail get tracking because server2 not have that tracking', (done)=>{
         chai.request(url)
-            .get('/api/tracking/' +id_tracking1_server1)
-            .set({authorization:token2})
+            .get('/api/trackings/' +id_tracking1_server1)
+            .set({authorization:token_server2})
             .end( function(err,res){
                 expect(res).to.have.status(404);
                 done();
@@ -198,11 +198,11 @@ describe('get tracking 1 of server 1 in server 2 ', ()=>{
     });
 });
 
-describe('get tracking 1 of server 1 in server 2', ()=>{
+describe('get tracking 2 of server 1 in server 2 ', ()=>{
     it('should fail get tracking because server2 not have that tracking', (done)=>{
         chai.request(url)
-            .get('/api/tracking/' +id_tracking1_server1)
-            .set({authorization:token2})
+            .get('/api/trackings/' +id_tracking2_server1)
+            .set({authorization:token_server2})
             .end( function(err,res){
                 expect(res).to.have.status(404);
                 done();
@@ -213,8 +213,8 @@ describe('get tracking 1 of server 1 in server 2', ()=>{
 describe('get tracking 1 of server 2 in server 1 ', ()=>{
     it('should fail get tracking because server1 not have that tracking', (done)=>{
         chai.request(url)
-            .get('/api/tracking/' +id_tracking1_server2)
-            .set({authorization:token1})
+            .get('/api/trackings/' +id_tracking1_server2)
+            .set({authorization:token_server1})
             .end( function(err,res){
                 expect(res).to.have.status(404);
                 done();
@@ -222,14 +222,42 @@ describe('get tracking 1 of server 2 in server 1 ', ()=>{
     });
 });
 
+//#################added#########################
 
-//--------------------------------------------------
+describe('get all trackings of the server 1',()=>{
+    it('should it have 2 trackings ',(done)=>{
+        chai.request(url)
+            .get('/api/trackings')
+            .set({authorization:token_server1})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                assert.equal(res.body.length,2);
+                done();
+            });
+    });
+});
+
+
+describe('get all trackings of the server 2',()=>{
+    it('should it have 1 tracking',(done)=>{
+        chai.request(url)
+            .get('/api/trackings')
+            .set({'authorization':token_server2})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                assert.equal(res.body.length,1);
+                done();
+            });
+    });
+});
+
+//###################################################
 
 describe('remove server 1', ()=>{
     it('should remove server 1 sucessfully', (done)=>{
         chai.request(url)
             .delete('/api/servers/'+id_server1)
-            .set({authorization:token1})
+            .set({authorization:token_server1})
             .send({createdBy:createdByData, name:nameServer1})
             .end( function(err,res){
                 expect(res).to.have.status(203);
@@ -242,7 +270,7 @@ describe('remove server 2', ()=>{
     it('should remove server 1sucessfully', (done)=>{
         chai.request(url)
             .delete('/api/servers/'+id_server2)
-            .set({authorization:token2})
+            .set({authorization:token_server2})
             .send({createdBy:createdByData, name:nameServer2})
             .end( function(err,res){
                 expect(res).to.have.status(203);
