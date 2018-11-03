@@ -178,7 +178,7 @@ describe('create payment 1 for test server 2 ',()=>{
 //----------------------------------------------------
 
 describe('get payments of test server 1',()=>{
-    it('should it have 2 payments ',(done)=>{
+    it('should it have 2 payments because their states are pending ',(done)=>{
         chai.request(url)
             .get('/api/payments')
             .set({'authorization':token_server1})
@@ -192,7 +192,7 @@ describe('get payments of test server 1',()=>{
 
 
 describe('get payments of test server 2',()=>{
-    it('should it have 1 payment',(done)=>{
+    it('should it have 1 payment because your status is pending',(done)=>{
         chai.request(url)
             .get('/api/payments')
             .set({'authorization':token_server2})
@@ -356,6 +356,7 @@ describe('get single payment_2_server1 of the server 2',()=>{
 });
 
 //################################################
+
 
 describe('remove server',()=>{
     it('should remove server with success',(done)=>{

@@ -1,7 +1,7 @@
 const logger =  require('../others/logger');
 var connect = require('../service/Connect');
 
-function getMyPayments (data){
+function getMyPayments(data){
     var client = connect();
     var nameFunction = arguments.callee.name;
     var text = "select * FROM payment WHERE server_fk=$1";
@@ -24,7 +24,7 @@ function getMyPayments (data){
 }
 
 
-function getAllPayments (){
+function getAllPayments(){
     var client = connect();
     var nameFunction = arguments.callee.name;
     var text = "select * FROM payment";
@@ -46,11 +46,11 @@ function getAllPayments (){
 }
 
 
-function createPayment (data){
+function createPayment(data){
     var nameFunction = arguments.callee.name;
     var client = connect();
-    var text1 = "INSERT INTO payment(currency,value,server_fk,expiration_month,expiration_year,method,number,type)";
-    var text2 = "VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *";
+    var text1 = "INSERT INTO payment(currency,value,server_fk,expiration_month,expiration_year,method,number,type,status)";
+    var text2 = "VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *";
     var currency = data.currency || '';
     var value = data.value || '';
     var server_fk = data.server_fk;
@@ -59,7 +59,8 @@ function createPayment (data){
     var method = data.method || '';
     var number = data.number || '';
     var type = data.type || '';
-    values = [currency,value,server_fk,expiration_month,expiration_year,method,number,type];
+    var status = data.status;
+    values = [currency,value,server_fk,expiration_month,expiration_year,method,number,type,status];
 
     var promise = new Promise(function(reject,resolve){
         client.query(text1+text2,values, (error, response) => {
@@ -77,12 +78,12 @@ function createPayment (data){
     return promise;
 }
 
-function getAllPaymentMethods (){
+function getAllPaymentMethods(){
     var client = connect();
     var nameFunction = arguments.callee.name;
 
     var promise = new Promise(function(reject,resolve){
-        client.query("select * FROM payment", (error, response) => {
+        client.query("select distinct method FROM payment", (error, response) => {
             if (error) {
                 logger.error(__filename,nameFunction,error);
                 reject(error);
@@ -98,12 +99,12 @@ function getAllPaymentMethods (){
 }
 
 
-function getMyPaymentMethods (data){
+function getMyPaymentMethods(data){
     var client = connect();
     var nameFunction = arguments.callee.name;
 
     var promise = new Promise(function(reject,resolve){
-        client.query("select * FROM payment WHERE server_fk=$1", [data.id],(error, response) => {
+        client.query("select distinct method FROM payment WHERE server_fk=$1", [data.id],(error, response) => {
             if (error) {
                 logger.error(__filename,nameFunction,error);
                 reject(error);
@@ -124,7 +125,7 @@ function getMyPaymentMethods (data){
  * return single payment of the particular server
  * @param {Object} data 
  */
-function getMySinglePayment (data){
+function getMySinglePayment(data){
     var client = connect();
     var nameFunction = arguments.callee.name;
     var text = "select * FROM payment WHERE server_fk=$1 and transaction_id=$2";
@@ -152,7 +153,7 @@ function getMySinglePayment (data){
  * return single payment of any server
  * @param {Object} data 
  */
-function getSinglePayment (data){
+function getSinglePayment(data){
     var client = connect();
     var nameFunction = arguments.callee.name;
     var text = "select * FROM payment WHERE transaction_id=$1";
@@ -174,6 +175,28 @@ function getSinglePayment (data){
 }
 
 
+function updateStatusPayment(data){
+    var nameFunction = arguments.callee.name;
+    var client = connect();
+    var text = 'UPDATE payment SET status=$1 WHERE transaction_id=$2 Returning*';
+
+    var promise = new Promise(function(reject,resolve){
+        client.query(text,[data.status,data.transaction_id], (error,response) =>{
+            if(error){
+                logger.error(__filename,nameFunction,error);
+                reject(error)
+            }else{
+                logger.info(__filename,nameFunction,'query update payment executed with success');
+                resolve(response);
+            }
+            client.end();
+        });
+    });
+
+    return promise;
+}
+
+
 module.exports = {
     getMyPayments: getMyPayments,
     getAllPayments:getAllPayments,
@@ -181,5 +204,6 @@ module.exports = {
     getAllPaymentMethods:getAllPaymentMethods,
     getMyPaymentMethods:getMyPaymentMethods,
     getMySinglePayment:getMySinglePayment,  //method added
-    getSinglePayment:getSinglePayment       //method added
+    getSinglePayment:getSinglePayment,      //method added
+    updateStatusPayment:updateStatusPayment //method added
 };

@@ -5,6 +5,7 @@ services:
       - shared-server
       - postgres
     build: ./test-server
+    container_name: testSharedServer_container
     links:
       - shared-server
     volumes:

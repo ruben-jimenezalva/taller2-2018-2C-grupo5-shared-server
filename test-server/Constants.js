@@ -1,7 +1,4 @@
 module.exports = {
-    secret: 'secret',
-    apiVersion: '1.0.0',
-    expireTime: 3600000,   //1 hour
     PURCHASE_REALIZED:'compra realizada',
     PAYMENT_PENDING:'compra realizada',
     PAYMENT_PENDING:'pago pendiente',
@@ -10,5 +7,4 @@ module.exports = {
     DELIVERY_PENDING:'envio pendiente',
     DELIVERY_IN_PROCESS:'envio en proceso',
     DELIVERY_REALIZED:'envio realizado',
-
 };

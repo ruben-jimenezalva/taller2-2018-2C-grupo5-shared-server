@@ -12,6 +12,9 @@ var token_server1;
 var token_server2;
 var id_server1;
 var id_server2;
+var id_payment1_server_1;
+var id_payment2_server_1;
+var id_payment1_server_2;
 var id_tracking1_server1;
 var id_tracking2_server1;
 var id_tracking1_server2;
@@ -89,19 +92,125 @@ describe('create server 2', ()=>{
     });
 });
 
-//--------------------------------------------------
-
+//----------------------------------------------------
 
 describe('create tracking for server 1', ()=>{
-    it('should create tracking succesfully', (done)=>{
+    it('should fail to create tracking because it has no associated payment', (done)=>{
         chai.request(url)
             .post('/api/trackings')
             .set({authorization:token_server1})
             .send({status:'created'})
             .end( function(err,res){
+                expect(res).to.have.status(500);
+                done();
+            });
+    });
+});
+
+
+describe('create tracking for server 2', ()=>{
+    it('should fail to create tracking because it has no associated payment', (done)=>{
+        chai.request(url)
+            .post('/api/trackings')
+            .set({authorization:token_server2})
+            .send({status:'created'})
+            .end( function(err,res){
+                expect(res).to.have.status(500);
+                done();
+            });
+    });
+});
+
+
+//--------------------------------------------------
+
+//%%%%%%%%%%PAYMENTS ASSOCIATED TO TRACKINGS%%%%%
+
+describe('create payment 1 for test server 1 ',()=>{
+    it('should create with success because it is authorized',(done)=>{
+        chai.request(url)
+            .post('/api/payments')
+            .set({'authorization':token_server1})
+            .send({
+                "currency":"pesos",
+                "value":"10000",
+                    "paymentMethod":{
+                        "expiration_month":"8",
+                        "expiration_year":"2020",
+                        "method":"method1",
+                        "number":"----",
+                        "type":"-----"
+                    }
+            })
+            .end(function(err,res){
                 expect(res).to.have.status(201);
-                var object = JSON.parse(res.text);
-                id_tracking1_server1 = object.id;
+                id_payment1_server_1 = res.body.transaction_id;
+                done();
+            });
+    });
+});
+
+describe('create payment 2 for test server 1 ',()=>{
+    it('should create with success because it is authorized',(done)=>{
+        chai.request(url)
+            .post('/api/payments')
+            .set({'authorization':token_server1})
+            .send({
+                "currency":"dolar",
+                "value":"300",
+                    "paymentMethod":{
+                        "expiration_month":"10",
+                        "expiration_year":"2019",
+                        "method":"method2",
+                        "number":"----",
+                        "type":"----"
+                    }
+            })
+            .end(function(err,res){
+                expect(res).to.have.status(201);
+                id_payment2_server_1 = res.body.transaction_id;
+                done();
+            });
+    });
+});
+
+describe('create payment 1 for test server 2 ',()=>{
+    it('should create with success because it is authorized',(done)=>{
+        chai.request(url)
+            .post('/api/payments')
+            .set({'authorization':token_server2})
+            .send({
+                "currency":"pesos",
+                "value":"902000",
+                    "paymentMethod":{
+                        "expiration_month":"",
+                        "expiration_year":"",
+                        "method":"method3",
+                        "number":"",
+                        "type":""
+                    }
+            })
+            .end(function(err,res){
+                expect(res).to.have.status(201);
+                id_payment1_server_2 = res.body.transaction_id;
+                done();
+            });
+    });
+});
+
+
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+describe('create tracking for server 1', ()=>{
+    it('should create tracking succesfully because it have payment associated', (done)=>{
+        chai.request(url)
+            .post('/api/trackings')
+            .set({authorization:token_server1})
+            .send({id: id_payment1_server_1})
+            .end( function(err,res){
+                expect(res).to.have.status(201);
+                id_tracking1_server1 = res.body.id;
                 done();
             });
     });
@@ -109,30 +218,28 @@ describe('create tracking for server 1', ()=>{
 
 
 describe('create tracking for server 1', ()=>{
-    it('should create tracking succesfully', (done)=>{
+    it('should create tracking succesfully because it have payment associated', (done)=>{
         chai.request(url)
             .post('/api/trackings')
             .set({authorization:token_server1})
-            .send({status:'created'})
+            .send({id: id_payment2_server_1})
             .end( function(err,res){
                 expect(res).to.have.status(201);
-                var object = JSON.parse(res.text);
-                id_tracking2_server1 = object.id;
+                id_tracking2_server1 = res.body.id;
                 done();
             });
     });
 });
 
 describe('create tracking for server 2', ()=>{
-    it('should create tracking succesfully', (done)=>{
+    it('should create tracking succesfully because it have payment associated', (done)=>{
         chai.request(url)
             .post('/api/trackings')
             .set({authorization:token_server2})
-            .send({status:'created'})
+            .send({id: id_payment1_server_2})
             .end( function(err,res){
                 expect(res).to.have.status(201);
-                var object = JSON.parse(res.text);
-                id_tracking1_server2 = object.id;
+                id_tracking1_server2 = res.body.id;
                 done();
             });
     });
@@ -252,6 +359,7 @@ describe('get all trackings of the server 2',()=>{
 });
 
 //###################################################
+
 
 describe('remove server 1', ()=>{
     it('should remove server 1 sucessfully', (done)=>{

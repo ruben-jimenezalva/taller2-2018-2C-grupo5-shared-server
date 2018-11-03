@@ -22,19 +22,11 @@ CREATE TABLE users (
     PRIMARY KEY (username)
 );
 
-CREATE TABLE tracking (
-    tracking_id UUID DEFAULT uuid_generate_v1(),
-    status VARCHAR(50) NOT NULL,
-    updateAt TIMESTAMP DEFAULT NOW(),
-    server_fk UUID, 
-    FOREIGN kEY (server_fk) REFERENCES server(server_id),
-    PRIMARY KEY (tracking_id)
-);
-
 CREATE TABLE payment(
     transaction_id UUID DEFAULT uuid_generate_v1(),
     currency VARCHAR(50),
     value FLOAT NOT NULL,
+    status VARCHAR(50) NOT NULL,
     server_fk UUID NOT NULL,
     method VARCHAR(50),
     expiration_month VARCHAR(50),
@@ -44,3 +36,15 @@ CREATE TABLE payment(
     FOREIGN kEY (server_fk) REFERENCES server(server_id),
     PRIMARY KEY (transaction_id)
 );
+
+CREATE TABLE tracking (
+    tracking_id UUID,
+    status VARCHAR(50) NOT NULL,
+    updateAt TIMESTAMP DEFAULT NOW(),
+    server_fk UUID NOT NULL,
+    FOREIGN kEY (tracking_id) REFERENCES payment(transaction_id),
+    FOREIGN kEY (server_fk) REFERENCES server(server_id),
+    PRIMARY KEY (tracking_id)
+);
+
+

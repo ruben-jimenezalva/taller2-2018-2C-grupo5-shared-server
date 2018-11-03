@@ -37,8 +37,7 @@ router.get('/',TokenController.verifyToken,db.getAllServers);
 router.get('/:id',TokenController.verifyToken, db.getSingleServer);
 
 //delete a app server
-router.delete('/:id',TokenController.verifyToken,db.removePayments,db.removeTrackings,TokenController.invalidateToken, db.removeServer);
-
+router.delete('/:id',TokenController.verifyToken,db.removeTrackings,db.removePayments,TokenController.invalidateToken, db.removeServer);
 
 
 module.exports = router;

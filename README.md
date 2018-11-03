@@ -3,6 +3,12 @@ Travis CI
 [![Build Status](https://travis-ci.org/rubenJimenez33/taller2-2018-2C-grupo5-shared-server.svg?branch=master)](https://travis-ci.org/rubenJimenez33/taller2-2018-2C-grupo5-shared-server)
 
 
+Coverage
+=========
+[![Coverage Status](https://coveralls.io/repos/github/rubenJimenez33/taller2-2018-2C-grupo5-shared-server/badge.svg?branch=master)](https://coveralls.io/github/rubenJimenez33/taller2-2018-2C-grupo5-shared-server?branch=master)
+
+
+
 Install Docker
 ==============
 
@@ -32,7 +38,7 @@ Before Deploy
 =======================
 Si no existe crear la base de datos.
 Dentro del directorio donde se escuentra el script de la base de datos:
-heroku pg:psql postgresql-asymmetrical-80628 --app shared-server-taller2-2c-2018 script.sql
+heroku pg:psql postgresql-animate-75510 --app shared-server-taller2-2c-2018 -f database.sql
 
 
 Deploy
@@ -48,9 +54,9 @@ $ heroku open
 Consultas desde curl
 =========================
 
-url_production = https://shared-server-taller2-2c-2018.herokuapp.com/api/servers
+url_production = https://shared-server-taller2-2c-2018.herokuapp.com/
 
-url_developed =http://localhost:8080/api/servers
+url_developed =http://localhost:8080/
 
 
  $ curl -X POST "url_ambiente" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{ \"createdBy\": \"anyUser\",\"name\": \"nameServer\"}"

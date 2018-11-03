@@ -1,13 +1,15 @@
 var logger = require('../others/logger');
 var model = require('./TrackingModels');
 var db = require('./TrackingAccessDB');
+var defaultStatus = require('../others/Constants');
 
 function createTracking (req, res, next){
     var nameFunction = arguments.callee.name;
 
     var data_create = {};
     data_create.server_fk = req.id;
-    data_create.status = req.body.status || '';
+    data_create.status = req.body.status || defaultStatus.DELIVERY_PENDING;
+    data_create.id = req.body.id;
 
     var res_create = db.createTracking(data_create);
     res_create.then(
@@ -89,10 +91,35 @@ function getAllTrackings (req, res, next){
     );
 }
 
+/**added */
+function updateTracking (req, res, next){
+    var nameFunction = arguments.callee.name;
+
+    var data_update = {};
+    data_update.status = req.body.status || "";
+    data_update.tracking_id = req.params.tracking_id;
+
+    if (data_update.status === ""){
+        res.status(400).json({code:400, message:"missing parameters"});
+    }else{
+        var res_update = db.updateStatusTracking(data_update);
+        res_update.then(
+            function(error){
+                res.status(500).json({code:500, message:error.message});
+                logger.error(__filename,nameFunction,error.message);
+            },
+            function(response){
+                res.status(200).send(model.getInfoTracking(response));
+                logger.info(__filename,nameFunction,'tracking update by user: '+data_update.id+' successfully');
+            }
+        );
+    }
+}
 
 module.exports = {
     createTracking: createTracking,
     getInfoTracking: getInfoTracking,
-    getAllTrackings:getAllTrackings
+    getAllTrackings:getAllTrackings,
+    updateTracking:updateTracking
 };
   

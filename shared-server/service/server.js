@@ -7,6 +7,7 @@ var Payment = require('../payment/Payment');
 var Tracking = require('../tracking/Tracking');
 var User = require('../user/User');
 var Delivery = require('../delivery/Delivery');
+var cors = require('cors');
 
 // Constants
 const PORT = process.env.PORT;
@@ -14,8 +15,12 @@ const PORT = process.env.PORT;
 // App
 const app = express();
 
+//Enable Alls CORS Request
+app.use(cors());
+
+
 app.get('/', (req, res) => {
-  res.send('Hello World..!');
+  res.status(200).send({code:200, message:'Hello World..!'});
 });
 
 app.use('/api/servers', AppServer);

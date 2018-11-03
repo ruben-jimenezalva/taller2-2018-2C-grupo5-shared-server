@@ -24,7 +24,7 @@ function verifyToken(req, res, next) {
         }else{
             //if is admin
             if(decoded.body.username){
-                logger.info(__filename,nameFunction,'Authorized Access to Admin: '+decoded.username);
+                logger.info(__filename,nameFunction,'Authorized Access to Admin: '+decoded.body.username);
                 req.username = decoded.body.username; //save because it can be used to data access
                 next();
             }else{

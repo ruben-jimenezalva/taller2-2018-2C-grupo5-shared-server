@@ -11,8 +11,8 @@ function createTracking (data){
     var client = connect();
     var nameFunction = arguments.callee.name;
 
-    var text = 'INSERT INTO tracking(status,server_fk) VALUES ($1,$2) RETURNING*';
-    var values = [data.status,data.server_fk];
+    var text = 'INSERT INTO tracking(status,server_fk,tracking_id) VALUES ($1,$2,$3) RETURNING*';
+    var values = [data.status,data.server_fk,data.id];
 
     var promise = new Promise(function(reject,resolve){
         client.query(text,values,(error,response)=>{
@@ -138,7 +138,28 @@ function getAllTrackings (){
     return promise;
 }
 
+/**added */
+function updateStatusTracking(data_update){
+    var client = connect();
+    var nameFunction = arguments.callee.name;
+    var text = 'UPDATE tracking SET status=$1 WHERE tracking_id=$2 RETURNING *';
 
+    var promise =  new Promise(function(reject,resolve){
+        client.query(text,[data_update.status,data_update.tracking_id],(error,response) =>{
+            if(error){
+                logger.error(__filename,nameFunction,error);
+                reject(error);
+            }else{
+                logger.info(__filename,nameFunction,'query update tracking: '+
+                data_update.tracking_id+'executed successfully');
+                resolve(response);
+            }
+            client.end();
+        });
+    });
+
+    return promise;
+}
 
 
 module.exports = {
@@ -146,6 +167,7 @@ module.exports = {
     getInfoMyTracking: getInfoMyTracking,
     getTracking:getTracking,
     getMyTrackings:getMyTrackings,
-    getAllTrackings:getAllTrackings
+    getAllTrackings:getAllTrackings,
+    updateStatusTracking:updateStatusTracking
 };
   

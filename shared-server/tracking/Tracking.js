@@ -21,6 +21,10 @@ router.use(bodyParser.urlencoded({
 router.post('/',tokenController.verifyToken,db.createTracking);
 
 
+//---   api used by admin
+router.put('/:tracking_id',tokenController.verifyToken,db.updateTracking);
+
+
 
 //---   api used by both
 

@@ -14,9 +14,15 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }));
 
+
 //---   api used by AppServer
 //create payment
 router.post('/',TokenController.verifyToken, db.createPayment);
+
+
+//---   api used by administrator
+//update payment
+router.put('/:transaction_id',TokenController.verifyToken, db.updateStatusPayment);
 
 
 
@@ -42,5 +48,8 @@ router.get('/methods',TokenController.verifyToken, db.getPaymentMethods);
  * return payment that belongs any Appserver if a Administrator execute the query
  */
 router.get('/:transaction_id',TokenController.verifyToken, db.getSinglePayment); //-----------> (added)
+
+
+
 
 module.exports = router;

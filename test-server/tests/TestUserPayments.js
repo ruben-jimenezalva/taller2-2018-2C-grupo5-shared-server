@@ -1,8 +1,9 @@
-
 const chai = require('chai');
 var chaiHttp = require('chai-http');
 const assert = chai.assert;
 const expect = chai.expect;
+var statusPayments = require('../Constants');
+
 
 chai.use(chaiHttp);
 const url = 'http://shared-server:8080';
@@ -235,6 +236,45 @@ describe('get all paymethods of all servers',()=>{
 });
 
 //################################################
+
+
+
+//&&&&&&&&&&&&&&&& MORE TEST ADDED &&&&&&&&&&&&&&&&&&&
+
+//update payments
+
+describe('update payment transaction_id_server1 to payment accepted',()=>{
+    it('should it update payment successfully',(done)=>{
+        chai.request(url)
+            .put('/api/payments/'+transaction_id_server1)
+            .send({'status':statusPayments.PAYMENT_ACCEPTED})
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                assert.equal(res.body.status,statusPayments.PAYMENT_ACCEPTED);
+                done();
+            });
+    });
+});
+
+
+
+describe('update payment transaction_id_server2 to payment declined',()=>{
+    it('should it update payment successfully',(done)=>{
+        chai.request(url)
+            .put('/api/payments/'+transaction_id_server2)
+            .send({'status':statusPayments.PAYMENT_DECLINED})            
+            .set({'authorization':tokenUser})
+            .end(function(err,res){
+                expect(res).to.have.status(200);
+                assert.equal(res.body.status,statusPayments.PAYMENT_DECLINED);
+                done();
+            });
+    });
+});
+
+
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 
 describe('delete server 1',() =>{
