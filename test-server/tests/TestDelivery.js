@@ -6,7 +6,11 @@ const expect = require('chai').expect;
 const assert = chai.assert;
 
 chai.use(chaiHttp);
-const url= "http://shared-server:8080";
+
+var urlApi= require('../Constants');
+var url= urlApi.URL;
+
+
 
 
 describe('TEST',() =>{

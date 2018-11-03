@@ -22,7 +22,11 @@ var method1_server_2 = 'method 1_server2--' + Math.random()*10000000000;
 
 
 chai.use(chaiHttp);
-const url = "http://shared-server:8080";
+
+var urlApi= require('../Constants');
+var url= urlApi.URL;
+
+
 
 
 describe('TEST',() =>{

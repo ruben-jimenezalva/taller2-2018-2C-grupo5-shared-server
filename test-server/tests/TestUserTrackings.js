@@ -7,7 +7,12 @@ var statusTracking = require('../Constants');
 
 
 chai.use(chaiHttp);
-const url = 'http://shared-server:8080';
+
+
+var urlApi= require('../Constants');
+var url= urlApi.URL;
+
+
 
 //global varibles
 var username = 'juan-gonzales' + Math.random()*1000000000;

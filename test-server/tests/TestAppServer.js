@@ -4,7 +4,6 @@ const chai = require('chai');
 var chaiHttp = require('chai-http');
 const expect = require('chai').expect;
 const assert = chai.assert;
-const fetch = require('node-fetch');
 var token;
 var newToken;
 var id;
@@ -14,7 +13,9 @@ var dataName = "server&***#$$$$+##++(-)11023*-+*2";
 var dataCreatedBy = "autor&***$$+##++(-)1113*-+*2";
 
 chai.use(chaiHttp);
-const url= "http://shared-server:8080";
+
+var urlApi= require('../Constants');
+var url= urlApi.URL;
 
 
 describe('TEST',() =>{

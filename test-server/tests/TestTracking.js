@@ -6,7 +6,11 @@ var assert = chai.assert;
 chai.use(chaiHttp);
 
 var id_tracking = 'aaaaaaaa-bbbb-cccc-dddd-0242ac140002';
-var url = 'http://shared-server:8080'
+
+var urlApi= require('../Constants');
+var url= urlApi.URL;
+
+
 
 var token_server1;
 var token_server2;

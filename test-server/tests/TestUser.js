@@ -5,7 +5,12 @@ const assert = chai.assert;
 const expect = chai.expect;
 
 chai.use(chaiHttp);
-const url = 'http://shared-server:8080';
+
+
+var urlApi= require('../Constants');
+var url= urlApi.URL;
+
+
 
 //global varibles
 var username = 'pepito-perez' + Math.random()*1000000000;

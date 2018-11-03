@@ -7,4 +7,5 @@ module.exports = {
     DELIVERY_PENDING:'envio pendiente',
     DELIVERY_IN_PROCESS:'envio en proceso',
     DELIVERY_REALIZED:'envio realizado',
+    URL:'http://localhost:8080',
 };
