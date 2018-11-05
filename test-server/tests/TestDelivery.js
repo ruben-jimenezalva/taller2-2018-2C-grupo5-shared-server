@@ -7,7 +7,7 @@ const assert = chai.assert;
 
 chai.use(chaiHttp);
 
-var urlApi= require('../Constants');
+var urlApi= require('../others/Constants');
 var url= urlApi.URL;
 
 

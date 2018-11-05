@@ -23,7 +23,7 @@ var method1_server_2 = 'method 1_server2--' + Math.random()*10000000000;
 
 chai.use(chaiHttp);
 
-var urlApi= require('../Constants');
+var urlApi= require('../others/Constants');
 var url= urlApi.URL;
 
 

@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 
 var id_tracking = 'aaaaaaaa-bbbb-cccc-dddd-0242ac140002';
 
-var urlApi= require('../Constants');
+var urlApi= require('../others/Constants');
 var url= urlApi.URL;
 
 

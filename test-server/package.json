@@ -6,7 +6,7 @@
   "main": "tests/*.js",
   "scripts": {
     "test-docker": "docker-compose up test-server",
-    "start-tests": "nyc --reporter=html --reporter=text mocha ./tests/*.js",
+    "start": "nyc --reporter=html --reporter=text mocha ./tests/*.js",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {

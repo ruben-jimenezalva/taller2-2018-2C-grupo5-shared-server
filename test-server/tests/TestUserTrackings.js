@@ -3,13 +3,13 @@ const chai = require('chai');
 var chaiHttp = require('chai-http');
 const assert = chai.assert;
 const expect = chai.expect;
-var statusTracking = require('../Constants');
+var statusTracking = require('../others/Constants');
 
 
 chai.use(chaiHttp);
 
 
-var urlApi= require('../Constants');
+var urlApi= require('../others/Constants');
 var url= urlApi.URL;
 
 

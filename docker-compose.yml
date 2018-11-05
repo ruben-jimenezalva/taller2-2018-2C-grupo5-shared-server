@@ -10,6 +10,7 @@ services:
       - shared-server
     volumes:
       - ./test-server/tests:/app/tests
+      - ./test-server/others:/app/others
   shared-server:
     depends_on:
       - postgres

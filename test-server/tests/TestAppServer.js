@@ -14,7 +14,7 @@ var dataCreatedBy = "autor&***$$+##++(-)1113*-+*2";
 
 chai.use(chaiHttp);
 
-var urlApi= require('../Constants');
+var urlApi= require('../others/Constants');
 var url= urlApi.URL;
 
 
