@@ -13,7 +13,7 @@ function getAllTrackigs(res){
     var trackings = [];
     for(i=0;i < res.rowCount;i++){
         var tracking = {
-            "updateAt" : res.rows[i].updateAt,
+            "updateAt" : res.rows[i].updateat,
             "id" : res.rows[i].tracking_id,
             "status" : res.rows[i].status
         };

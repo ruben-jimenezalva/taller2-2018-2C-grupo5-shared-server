@@ -118,14 +118,21 @@ describe('create payment 1 for test server 1 ',()=>{
                         "expiration_month":"8",
                         "expiration_year":"2020",
                         "method":method1_server_1,
-                        "number":"----",
-                        "type":"-----"
+                        "number":"1234",
+                        "type":"anytype"
                     }
             })
             .end(function(err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
                 id_payment1_server_1 = object.transaction_id;
+                assert.equal("pesos",res.body.currency);
+                assert.equal("10000",res.body.value);
+                assert.equal("8",res.body.paymentMethod.expiration_month);
+                assert.equal("2020",res.body.paymentMethod.expiration_year);
+                assert.equal(method1_server_1,res.body.paymentMethod.method);
+                assert.equal("1234",res.body.paymentMethod.number);
+                assert.equal("anytype",res.body.paymentMethod.type);
                 done();
             });
     });
@@ -149,6 +156,13 @@ describe('create payment 2 for test server 1 ',()=>{
             })
             .end(function(err,res){
                 expect(res).to.have.status(201);
+                assert.equal("dolar",res.body.currency);
+                assert.equal("300",res.body.value);
+                assert.equal("10",res.body.paymentMethod.expiration_month);
+                assert.equal("2019",res.body.paymentMethod.expiration_year);
+                assert.equal(method2_server_1,res.body.paymentMethod.method);
+                assert.equal("----",res.body.paymentMethod.number);
+                assert.equal("----",res.body.paymentMethod.type);
                 id_payment2_server_1 = res.body.transaction_id;
                 done();
             });

@@ -7,5 +7,5 @@ module.exports = {
     DELIVERY_PENDING:'envio pendiente',
     DELIVERY_IN_PROCESS:'envio en proceso',
     DELIVERY_REALIZED:'envio realizado',
-    URL:'http://shared-server:8080',
+    URL:'https://shared-server-taller2-2c-2018.herokuapp.com',
 };

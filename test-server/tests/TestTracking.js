@@ -142,8 +142,8 @@ describe('create payment 1 for test server 1 ',()=>{
                         "expiration_month":"8",
                         "expiration_year":"2020",
                         "method":"method1",
-                        "number":"----",
-                        "type":"-----"
+                        "number":"1234",
+                        "type":"anytype"
                     }
             })
             .end(function(err,res){

@@ -18,7 +18,7 @@ function getAllServers (){
         });
 
     });
-
+    
     return promise;
 }
 

@@ -7,7 +7,7 @@ function getMyPayments(res){
             "value" : res.rows[i].value,
             "status" : res.rows[i].status,
             "paymentMethod" : {
-              "epiration_month" : res.rows[i].epiration_month,
+              "expiration_month" : res.rows[i].expiration_month,
               "expiration_year" : res.rows[i].expiration_year,
               "number" : res.rows[i].number,
               "method" : res.rows[i].method,
@@ -27,7 +27,7 @@ function singlePayment(res){
         "value" : res.rows[0].value,
         "status" : res.rows[0].status,
         "paymentMethod" : {
-            "epiration_month" : res.rows[0].epiration_month,
+            "expiration_month" : res.rows[0].expiration_month,
             "expiration_year" : res.rows[0].expiration_year,
             "number" : res.rows[0].number,
             "method" : res.rows[0].method,
