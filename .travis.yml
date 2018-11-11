@@ -8,13 +8,11 @@ services:
 
 before_script:
   - sudo docker-compose up -d postgres
-  - ls -l
   - cd shared-server
-  - ls -l
   - npm install
 
 script:
   - npm test
 
 after_success:
-  - npm coverage
+  - npm run coverage
