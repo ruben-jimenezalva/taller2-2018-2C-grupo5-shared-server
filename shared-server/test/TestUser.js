@@ -6,10 +6,8 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-
-var urlApi= require('../others/Constants');
-var url= urlApi.URL;
-
+const APP = require('../service/express');
+const server = APP.listen();
 
 
 //global varibles
@@ -31,7 +29,7 @@ describe('TEST',() =>{
 
 describe('test regiter', ()=>{
     it('sould failure because missing all parameters', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/register')
             .end(function(err,res){
                 expect(res).to.have.status(400);
@@ -43,7 +41,7 @@ describe('test regiter', ()=>{
 
 describe('test regiter', ()=>{
     it('sould failure because missing username', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/register')
             .send({password:password})
             .end(function(err,res){
@@ -55,7 +53,7 @@ describe('test regiter', ()=>{
 
 describe('test regiter', ()=>{
     it('sould failure because missing password', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/register')
             .send({username:username})
             .end(function(err,res){
@@ -69,7 +67,7 @@ describe('test regiter', ()=>{
 
 describe('test login', ()=>{
     it('sould failure because missing all parameters', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/login')
             .end(function(err,res){
                 expect(res).to.have.status(400);
@@ -81,7 +79,7 @@ describe('test login', ()=>{
 
 describe('test login', ()=>{
     it('sould failure because missing username', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/login')
             .send({password:password})
             .end(function(err,res){
@@ -93,7 +91,7 @@ describe('test login', ()=>{
 
 describe('test login', ()=>{
     it('sould failure because missing password', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/login')
             .send({username:username})
             .end(function(err,res){
@@ -107,7 +105,7 @@ describe('test login', ()=>{
 
 describe('test login', ()=>{
     it('sould failure because it is not yet registered', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/login')
             .send({username:username, password:password})
             .end(function(err,res){
@@ -122,7 +120,7 @@ describe('test login', ()=>{
 
 describe('test regiter', ()=>{
     it('sould register with success', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/register')
             .send({username:username, password:password})
             .end(function(err,res){
@@ -136,7 +134,7 @@ describe('test regiter', ()=>{
 
 describe('test login', ()=>{
     it('sould failiru login because username incorrect', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/login')
             .send({username:'username', password:password})
             .end(function(err,res){
@@ -148,7 +146,7 @@ describe('test login', ()=>{
 
 describe('test login', ()=>{
     it('sould failiru login because password incorrect', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/login')
             .send({username:username, password:'password'})
             .end(function(err,res){
@@ -162,7 +160,7 @@ describe('test login', ()=>{
 
 describe('test login', ()=>{
     it('sould login with success', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/login')
             .send({username:username, password:password})
             .end(function(err,res){
@@ -178,7 +176,7 @@ describe('test login', ()=>{
 
 describe('test get all server with admin', ()=>{
     it('sould obtain all servers successfully', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/servers')
             .set({authorization:tokenUser})
             .end(function(err,res){

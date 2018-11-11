@@ -4,12 +4,10 @@ const assert = chai.assert;
 const expect = chai.expect;
 var statusPayments = require('../others/Constants');
 
-
 chai.use(chaiHttp);
 
-var urlApi= require('../others/Constants');
-var url= urlApi.URL;
-
+const APP = require('../service/express');
+const server = APP.listen();
 
 
 //global varibles
@@ -43,10 +41,9 @@ describe('TEST',() =>{
 });
 
 
-
 describe('test regiter', ()=>{
     it('sould register with success', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/register')
             .send({username:username, password:password})
             .end(function(err,res){
@@ -59,7 +56,7 @@ describe('test regiter', ()=>{
 
 describe('test login', ()=>{
     it('sould login with success', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/login')
             .send({username:username, password:password})
             .end(function(err,res){
@@ -76,7 +73,7 @@ describe('test login', ()=>{
 
 describe('test create server_1', ()=>{
     it('sould create server_1 successfully', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/servers')
             .send({createdBy:dataCreated_1, name:dataName_1})
             .end(function(err,res){
@@ -92,7 +89,7 @@ describe('test create server_1', ()=>{
 
 describe('test create server_2', ()=>{
     it('sould create server_2 successfully', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/servers')
             .send({createdBy:dataCreated_2, name:dataName_2})
             .end(function(err,res){
@@ -109,7 +106,7 @@ describe('test create server_2', ()=>{
 
 describe('test create payment for server 1', ()=>{
     it('sould create payment for server_1 successfully', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/payments')
             .send({
                 "currency":"pesos",
@@ -135,7 +132,7 @@ describe('test create payment for server 1', ()=>{
 
 describe('test create payment for server 2', ()=>{
     it('sould create payment for server_2 successfully', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/payments')
             .send({
                 "currency":"pesos",
@@ -162,7 +159,7 @@ describe('test create payment for server 2', ()=>{
 
 describe('get all payments of all the servers',()=>{
     it('should it obtain all payments but the transactions searched not exists',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/payments')
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -178,7 +175,7 @@ describe('get all payments of all the servers',()=>{
 
 describe('get all payments of all the servers',()=>{
     it('should it obtain all payments and transactions searched exists',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/payments')
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -198,7 +195,7 @@ describe('get all payments of all the servers',()=>{
 
 describe('get single payment_1_server1 of the server 1',()=>{
     it('should obtain the payment_1_server1 successfully because query is executed by admin',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/payments/'+ transaction_id_server1)
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -212,7 +209,7 @@ describe('get single payment_1_server1 of the server 1',()=>{
 
 describe('get single payment_1_server2 of the server 2',()=>{
     it('should obtain the payment_1_server2 successfully because query is executed by admin',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/payments/'+ transaction_id_server2)
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -227,7 +224,7 @@ describe('get single payment_1_server2 of the server 2',()=>{
 
 describe('get all paymethods of all servers',()=>{
     it('should obtain all paymethods successfully because the query is executed by admin',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/payments/methods')
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -249,7 +246,7 @@ describe('get all paymethods of all servers',()=>{
 
 describe('update payment transaction_id_server1 to payment accepted',()=>{
     it('should it update payment successfully',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .put('/api/payments/'+transaction_id_server1)
             .send({'status':statusPayments.PAYMENT_ACCEPTED})
             .set({'authorization':tokenUser})
@@ -265,7 +262,7 @@ describe('update payment transaction_id_server1 to payment accepted',()=>{
 
 describe('update payment transaction_id_server2 to payment declined',()=>{
     it('should it update payment successfully',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .put('/api/payments/'+transaction_id_server2)
             .send({'status':statusPayments.PAYMENT_DECLINED})            
             .set({'authorization':tokenUser})
@@ -283,7 +280,7 @@ describe('update payment transaction_id_server2 to payment declined',()=>{
 
 describe('delete server 1',() =>{
     it('should delete single server with success',(done) =>{
-        chai.request(url)
+        chai.request(server) 
             .delete('/api/servers/'+server_id_1)
             .set({'Authorization':token_server_1})
             .end( function (err,res){
@@ -295,7 +292,7 @@ describe('delete server 1',() =>{
 
 describe('delete server 2',() =>{
     it('should delete single server with success',(done) =>{
-        chai.request(url)
+        chai.request(server) 
             .delete('/api/servers/'+server_id_2)
             .set({'Authorization':token_server_2})
             .end( function (err,res){
@@ -309,7 +306,7 @@ describe('delete server 2',() =>{
 
 describe('get all payments of all servers',()=>{
     it('should it obtain all payments but transactions searched not exists because were deleted',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/payments')
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -324,7 +321,7 @@ describe('get all payments of all servers',()=>{
 
 describe('get single payment of the server_1',()=>{
     it('should it fail because server 1 was deleted',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/payments/'+transaction_id_server1)
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -336,7 +333,7 @@ describe('get single payment of the server_1',()=>{
 
 describe('get single payment of the server_2',()=>{
     it('should it fail because server 2 was deleted',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/payments/'+transaction_id_server2)
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -350,7 +347,7 @@ describe('get single payment of the server_2',()=>{
 
 describe('get all paymethods of all servers',()=>{
     it('should it obtain all paymethods but methods searched not exists because were deleted',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/payments/methods')
             .set({'authorization':tokenUser})
             .end(function(err,res){

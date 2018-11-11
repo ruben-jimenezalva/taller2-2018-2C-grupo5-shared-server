@@ -7,4 +7,3 @@ ADD nodemon.json /app/nodemon.json
 COPY . .
 EXPOSE 8080
 CMD [ "npm", "start" ]
-

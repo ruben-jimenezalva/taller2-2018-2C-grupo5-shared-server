@@ -91,8 +91,8 @@ function getSingleServer (data){
 
 
 function updateServer (data){
-    var client = connect();
     var nameFunction = arguments.callee.name;
+    var client = connect();
     values = [data.name,data._rev,data.server_id];
     text = 'UPDATE server SET nameServer=$1, _rev=$2 WHERE server_id=$3 RETURNING *';
 

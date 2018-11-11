@@ -1,22 +1,11 @@
 version: "2"
 services:
-  test-server:
-    depends_on:
-      - shared-server
-      - postgres
-    build: ./test-server
-    container_name: testSharedServer_container
-    links:
-      - shared-server
-    volumes:
-      - ./test-server/tests:/app/tests
-      - ./test-server/others:/app/others
   shared-server:
     depends_on:
       - postgres
     build: ./shared-server
     ports:
-      - "8080:8080"
+      - "8000:8080"
     container_name: sharedServer_container
     environment:
       - PGPASSWORD=postgres
@@ -30,6 +19,7 @@ services:
       - postgres
     volumes:
       - './shared-server/service:/app/service'
+      - './shared-server/coverage:/app/coverage'
       - './shared-server/appServer:/app/appServer'
       - './shared-server/auth:/app/auth'
       - './shared-server/delivery:/app/delivery'
@@ -43,7 +33,7 @@ services:
     image: postgres
     container_name: pg_container
     ports:
-      - "5432"
+      - "5400:5432"
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password

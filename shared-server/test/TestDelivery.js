@@ -7,10 +7,8 @@ const assert = chai.assert;
 
 chai.use(chaiHttp);
 
-var urlApi= require('../others/Constants');
-var url= urlApi.URL;
-
-
+const APP = require('../service/express');
+const server = APP.listen();
 
 
 describe('TEST',() =>{
@@ -24,7 +22,7 @@ describe('TEST',() =>{
 
 describe('calculate delivery ',() =>{
     it('should response a mock delivery',(done) =>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/deliveries/estimate')
             .end( function (err,res){
                 expect(res).to.have.status(200);

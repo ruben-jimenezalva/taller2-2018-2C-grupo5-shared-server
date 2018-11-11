@@ -5,13 +5,10 @@ const assert = chai.assert;
 const expect = chai.expect;
 var statusTracking = require('../others/Constants');
 
-
 chai.use(chaiHttp);
 
-
-var urlApi= require('../others/Constants');
-var url= urlApi.URL;
-
+const APP = require('../service/express');
+const server = APP.listen();
 
 
 //global varibles
@@ -34,7 +31,6 @@ var id_payment1_server_1;
 var id_payment1_server_2;
 
 
-
 describe('TEST',() =>{
     it('BEGIN TEST',(done) =>{
         console.log("======================================");
@@ -48,7 +44,7 @@ describe('TEST',() =>{
 
 describe('test regiter', ()=>{
     it('sould register with success', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/register')
             .send({username:username, password:password})
             .end(function(err,res){
@@ -61,7 +57,7 @@ describe('test regiter', ()=>{
 
 describe('test login', ()=>{
     it('sould login with success', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/user/login')
             .send({username:username, password:password})
             .end(function(err,res){
@@ -78,7 +74,7 @@ describe('test login', ()=>{
 
 describe('test create server_1', ()=>{
     it('sould create server_1 successfully', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/servers')
             .send({createdBy:dataCreated_1, name:dataName_1})
             .end(function(err,res){
@@ -94,7 +90,7 @@ describe('test create server_1', ()=>{
 
 describe('test create server_2', ()=>{
     it('sould create server_2 successfully', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/servers')
             .send({createdBy:dataCreated_2, name:dataName_2})
             .end(function(err,res){
@@ -112,7 +108,7 @@ describe('test create server_2', ()=>{
 
 describe('create payment 1 for test server 1 ',()=>{
     it('should create with success because it is authorized',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/payments')
             .set({'authorization':token_server1})
             .send({
@@ -136,7 +132,7 @@ describe('create payment 1 for test server 1 ',()=>{
 
 describe('create payment 1 for test server 2 ',()=>{
     it('should create with success because it is authorized',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/payments')
             .set({'authorization':token_server2})
             .send({
@@ -171,7 +167,7 @@ describe('create payment 1 for test server 2 ',()=>{
 
 describe('create tracking for server 1', ()=>{
     it('should create tracking successfully and it is associated to a payment', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/trackings')
             .set({authorization:token_server1})
             .send({id:id_payment1_server_1})
@@ -187,7 +183,7 @@ describe('create tracking for server 1', ()=>{
 
 describe('create tracking for server 2', ()=>{
     it('should create tracking successfully and it is associated to a payment', (done)=>{
-        chai.request(url)
+        chai.request(server) 
             .post('/api/trackings')
             .set({authorization:token_server2})
             .send({id: id_payment1_server_2})
@@ -204,7 +200,7 @@ describe('create tracking for server 2', ()=>{
 
 describe('get single tracking of the server 1',()=>{
     it('should obtain tracking successfully',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings/'+ id_tracking1_server1)
             .set({authorization:token_server1})
             .end(function(err,res){
@@ -219,7 +215,7 @@ describe('get single tracking of the server 1',()=>{
 
 describe('get single tracking of the server 2',()=>{
     it('should obtain tracking successfully',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings/'+id_tracking1_server2)
             .set({'authorization':token_server2})
             .end(function(err,res){
@@ -236,7 +232,7 @@ describe('get single tracking of the server 2',()=>{
 
 describe('get single tracking of the server2 in server 1',()=>{
     it('should fail because server1 no contain that tracking',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings/'+ id_tracking1_server2)
             .set({authorization:token_server1})
             .end(function(err,res){
@@ -251,7 +247,7 @@ describe('get single tracking of the server2 in server 1',()=>{
 
 describe('get single tracking of the server1 in server 2',()=>{
     it('should fail because server2 no contain that tracking',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings/'+id_tracking1_server1)
             .set({'authorization':token_server2})
             .end(function(err,res){
@@ -269,7 +265,7 @@ describe('get single tracking of the server1 in server 2',()=>{
 
 describe('get single tracking of the server2 by the admin',()=>{
     it('should obtain succesfully because admin can obtain all trackings',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings/'+ id_tracking1_server2)
             .set({authorization:tokenUser})
             .end(function(err,res){
@@ -284,7 +280,7 @@ describe('get single tracking of the server2 by the admin',()=>{
 
 describe('get single tracking of the server1 by the admin',()=>{
     it('should obtain succesfully because admin can obtain all trackings',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings/'+id_tracking1_server1)
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -303,7 +299,7 @@ describe('get single tracking of the server1 by the admin',()=>{
 
 describe('get all trackings of all the servers',()=>{
     it('should it obtain all trackings and trackings searched exists',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings')
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -317,7 +313,7 @@ describe('get all trackings of all the servers',()=>{
 
 describe('get all trackings of all the servers',()=>{
     it('should it obtain all trackings and trackings searched not exists',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings')
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -337,7 +333,7 @@ describe('get all trackings of all the servers',()=>{
 /*
 describe('update tracking 1 of server2', () =>{
     it('should fail update tracking 1 of server2 because token not authorizated',(done) =>{
-        chai.request(url)
+        chai.request(server) 
         .put('/api/trackings/'+id_tracking1_server2)
         .send({'Authorization':token_server1})
         .set({'status':statusTracking.DELIVERY_REALIZED})
@@ -352,7 +348,7 @@ describe('update tracking 1 of server2', () =>{
 
 describe('update tracking 1 of server1', () =>{
     it('should update tracking 1 of server1 to status in process sucessfully',(done) =>{
-        chai.request(url)
+        chai.request(server) 
         .put('/api/trackings/'+id_tracking1_server1)
         .set({'Authorization':tokenUser})
         .send({'status':statusTracking.DELIVERY_IN_PROCESS})
@@ -367,7 +363,7 @@ describe('update tracking 1 of server1', () =>{
 
 describe('update tracking 1 of server2', () =>{
     it('should update tracking 1 of server2 to status realized sucessfully',(done) =>{
-        chai.request(url)
+        chai.request(server) 
         .put('/api/trackings/'+id_tracking1_server2)
         .set({'Authorization':tokenUser})
         .send({'status':statusTracking.DELIVERY_REALIZED})
@@ -385,7 +381,7 @@ describe('update tracking 1 of server2', () =>{
 
 describe('delete server 1',() =>{
     it('should delete single server with success',(done) =>{
-        chai.request(url)
+        chai.request(server) 
             .delete('/api/servers/'+server_id_1)
             .set({'Authorization':token_server1})
             .end( function (err,res){
@@ -397,7 +393,7 @@ describe('delete server 1',() =>{
 
 describe('delete server 2',() =>{
     it('should delete single server with success',(done) =>{
-        chai.request(url)
+        chai.request(server) 
             .delete('/api/servers/'+server_id_2)
             .set({'Authorization':token_server2})
             .end( function (err,res){
@@ -412,7 +408,7 @@ describe('delete server 2',() =>{
 
 describe('get single tracking of the server2 by the admin',()=>{
     it('should fail because the trackings of the server2 were deleted',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings/'+ id_tracking1_server2)
             .set({authorization:tokenUser})
             .end(function(err,res){
@@ -427,7 +423,7 @@ describe('get single tracking of the server2 by the admin',()=>{
 
 describe('get single tracking of the server1 by the admin',()=>{
     it('should fail because the trackings of the server1 were deleted',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings/'+id_tracking1_server1)
             .set({'authorization':tokenUser})
             .end(function(err,res){
@@ -444,7 +440,7 @@ describe('get single tracking of the server1 by the admin',()=>{
 
 describe('get all trackings of all the servers',()=>{
     it('should it obtain all trackings but trackings searched not exists because were deleted',(done)=>{
-        chai.request(url)
+        chai.request(server) 
             .get('/api/trackings')
             .set({'authorization':tokenUser})
             .end(function(err,res){

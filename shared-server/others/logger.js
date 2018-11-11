@@ -28,10 +28,6 @@ const winstonLogger = winston.createLogger({
   
 
   var logger = {
-
-      log: function(level, message) {
-            winstonLogger.log(level,message,{timestamp: new Date()});
-      },
       error: function(file,nameFunction,message) {
             var data = {timestamp: new Date(), file:file, function:nameFunction};
             winstonLogger.error(message,data);
@@ -39,10 +35,6 @@ const winstonLogger = winston.createLogger({
       warn: function(file,nameFunction,message) {
             var data = {timestamp: new Date(), file:file, function:nameFunction};
             winstonLogger.warn(message,data);
-      },
-      verbose: function(file,nameFunction,message) {
-            var data = {timestamp: new Date(), file:file, function:nameFunction};
-            winstonLogger.verbose(message,data);
       },
       info: function(file,nameFunction,message) {
             var data = {timestamp: new Date(), file:file, function:nameFunction};

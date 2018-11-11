@@ -1,6 +1,6 @@
 const pg = require('pg');
 const logger = require('../others/logger');
-var connectionString = process.env.DATABASE_URL; 
+var connectionString = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5400/user'; 
 
 function connect(){
     var nameFunction = arguments.callee.name;    

@@ -4,6 +4,14 @@ const chai = require('chai');
 var chaiHttp = require('chai-http');
 const expect = require('chai').expect;
 const assert = chai.assert;
+
+chai.use(chaiHttp);
+
+const APP = require('../service/express');
+const server = APP.listen();
+
+
+//variables
 var token;
 var newToken;
 var id;
@@ -11,11 +19,6 @@ var _rev;
 var new_rev;
 var dataName = "server&***#$$$$+##++(-)11023*-+*2";
 var dataCreatedBy = "autor&***$$+##++(-)1113*-+*2";
-
-chai.use(chaiHttp);
-
-var urlApi= require('../others/Constants');
-var url= urlApi.URL;
 
 
 describe('TEST',() =>{
@@ -30,7 +33,7 @@ describe('TEST',() =>{
 
 describe('get all Servers ',() =>{
     it('should fail because no use token',(done) =>{
-        chai.request(url)
+        chai.request(server)           
             .get('/api/servers')
             .end( function (err,res){
                 expect(res).to.have.status(401);
@@ -42,7 +45,7 @@ describe('get all Servers ',() =>{
 
 describe('create server',() =>{
     it('should fail because missing arg',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .post('/api/servers')
             .send({createdBy:"autor1"})
             .end( function (err,res){
@@ -55,7 +58,7 @@ describe('create server',() =>{
 
 describe('create server',() =>{
     it('should get token, register success',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .post('/api/servers')
             .timeout(10000)
             .send({createdBy:dataCreatedBy, name:dataName})
@@ -73,7 +76,7 @@ describe('create server',() =>{
 
 describe('get all servers with token',() =>{
     it('should get all servers with success',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .get('/api/servers')
             .set({'Authorization':token})
             .end( function (err,res){
@@ -86,7 +89,7 @@ describe('get all servers with token',() =>{
 
 describe('get single server with token',() =>{
     it('should get single server with success',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .get('/api/servers/'+id)
             .set({'Authorization':token})
             .end( function (err,res){
@@ -101,7 +104,7 @@ describe('get single server with token',() =>{
 
 describe('get single server with token',() =>{
     it('should no get single server because id no exists',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .get('/api/servers/aaaaaaaa-bbbb-cccc-dddd-eeeeffff0002')
             .set({'Authorization':token})
             .end( function (err,res){
@@ -115,9 +118,9 @@ describe('get single server with token',() =>{
 
 describe('get single server with false token',() =>{
     it('should no get single server',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .get('/api/servers/'+id)
-            .set({'Authorization':url})
+            .set({'Authorization':'falseToken'})
             .end( function (err,res){
                 expect(res).to.have.status(401);
                 done();
@@ -128,7 +131,7 @@ describe('get single server with false token',() =>{
 
 describe('reset token of a server',() =>{
     it('should update the token',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .post('/api/servers/'+id)
             .end( function (err,res){
                 expect(res).to.have.status(201);
@@ -142,7 +145,7 @@ describe('reset token of a server',() =>{
 
 describe('get all servers with token canceled by a reset',() =>{
     it('should fail get all servers because token is invalid',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .get('/api/servers')
             .set({'Authorization':token})
             .end( function (err,res){
@@ -156,7 +159,7 @@ describe('get all servers with token canceled by a reset',() =>{
 
 describe('update server with field _rev & name nulls',() =>{
     it('should fail update because _rev & name are nulls',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .put('/api/servers/'+id)
             .send({_rev:'', name:''})
             .set({'Authorization':newToken})
@@ -171,7 +174,7 @@ describe('update server with field _rev & name nulls',() =>{
 
 describe('update server with field _rev invalid',() =>{
     it('should fail update _rev is invalid',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .put('/api/servers/'+id)
             .send({_rev:"nananananabatman", name:"newName"})
             .set({'Authorization':newToken})
@@ -185,7 +188,7 @@ describe('update server with field _rev invalid',() =>{
 
 describe('update server with field _rev valid',() =>{
     it('should update with success',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .put('/api/servers/'+id)
             .send({_rev:_rev, name:"newName"})
             .set({'Authorization':newToken})
@@ -201,7 +204,7 @@ describe('update server with field _rev valid',() =>{
 
 describe('update server with new field _rev valid',() =>{
     it('should update with success',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .put('/api/servers/'+id)
             .send({_rev:new_rev, name:"newName2"})
             .set({'Authorization':newToken})
@@ -215,7 +218,7 @@ describe('update server with new field _rev valid',() =>{
 
 describe('delete server',() =>{
     it('should delete single server with success',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .delete('/api/servers/'+id)
             .set({'Authorization':newToken})
             .end( function (err,res){
@@ -228,7 +231,7 @@ describe('delete server',() =>{
 
 describe('get all servers with token canceled by a deleted server',() =>{
     it('should fail get all servers because token is invalid',(done) =>{
-        chai.request(url)
+        chai.request(server)
             .get('/api/servers')
             .set({'Authorization':newToken})
             .end( function (err,res){

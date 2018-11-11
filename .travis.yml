@@ -3,12 +3,14 @@ language: generic
 
 services:
   - docker
-  
-install:
-  - sudo docker-compose build
 
 before_script:
-  - sudo docker-compose up -d shared-server postgres
+  - sudo docker-compose up -d postgres
+  - cd shared-server
+  - sudo npm install
 
 script:
-  - sudo docker-compose up test-server
+  - sudo npm run test
+
+after_success:
+  - sudo npm run coverage
