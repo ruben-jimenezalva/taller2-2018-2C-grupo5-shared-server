@@ -8,7 +8,7 @@
     "prestart": "nodemon -L app/bin/www",
     "start": "node service/server.js",
     "test": "mocha ./test/*.js --timeout 10000 --exit",
-    "coverLocal": "nyc --reporter=html --reporter=text npm test",
+    "cover": "nyc --reporter=html --reporter=text npm test",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
