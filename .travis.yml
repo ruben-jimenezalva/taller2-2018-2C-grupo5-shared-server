@@ -11,7 +11,7 @@ before_script:
   - ls -l
   - cd shared-server
   - ls -l
-  - sudo npm install
+  - npm install
 
 script:
   - npm test
