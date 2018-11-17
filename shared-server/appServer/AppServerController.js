@@ -28,9 +28,10 @@ function createServer (req, res, next){
     var data_create = {};
     var createdBy = req.body.createdBy || '';
     var name = req.body.name || '';
+    var url = req.body.url || '';
 
     //validate data input
-    if(createdBy == '' || name == ''){
+    if(createdBy == '' || name == ''|| url == ''){
         logger.warn(__filename,nameFunction,'missing parameters to create server');
         return res.status(400).json({code: 400, message: 'breach of preconditions (missing parameters)'});
     }
@@ -43,6 +44,7 @@ function createServer (req, res, next){
     data_create.jti = tokenResponse.jti;
     data_create.createdBy = createdBy;
     data_create.name = name;
+    data_create.url = url;
 
     //create server
     var res_create = db.createServer(data_create);
@@ -262,6 +264,12 @@ function removePayments (req, res, next){
         }
     );
 }
+
+
+function pingAppServer(req, res, next){
+    var server
+}
+
 
 
 

@@ -8,6 +8,8 @@ CREATE TABLE server (
     lastConnection TIMESTAMP DEFAULT NOW(),
     _rev VARCHAR(50),
     jti VARCHAR(50),
+    url VARCHAR(255),
+    UNIQUE(url),
     UNIQUE(nameServer,createdBy),
     PRIMARY KEY (server_id)
 );

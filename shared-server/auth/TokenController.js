@@ -32,7 +32,7 @@ function verifyToken(req, res, next) {
                 var data_get = {};
                 data_get.jti = decoded.body.jti;
                 var id = decoded.body.id;
-                // consult jti in database
+                // consult if jti is in blacklist
                 var nameFunction = arguments.callee.name;
                 var promise = db_token.getTokensOfBlackList(data_get);
                 promise.then(
@@ -41,6 +41,7 @@ function verifyToken(req, res, next) {
                         res.status(500).send({ code:500, message:error.message });
                     },
                     function(response){
+                        //if jwt is in blacklist
                         if(response.rowCount != 0){
                             logger.warn(__filename,nameFunction,'Unauthorized Access to server: '+id);
                             res.status(401).send({ code:401, message: 'Unauthorized Access' });
@@ -48,7 +49,16 @@ function verifyToken(req, res, next) {
                         else{
                             logger.info(__filename,nameFunction,'Authorized Access to server: '+id);
                             req.id = id; //save because it can be used to data access
-                            next();
+                            db_server.updateLastConnection(id).then(
+                                function(error){
+                                    logger.error(__filename,nameFunction,error.message);
+                                    res.status(500).json({code: 500, message: error.message});
+                                },
+                                function(response){
+                                    logger.error(__filename,nameFunction,error.message);
+                                    next();
+                                }
+                            );
                         }
                     }
                 );
@@ -93,8 +103,8 @@ function invalidateToken(req, res, next) {
     var res_select = db_server.getSingleServer(data_select);
     res_select.then(
         function(error){
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code: 500, message: err.message});
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message: error.message});
         },
         function(response){
             if(response.rowCount == 0){

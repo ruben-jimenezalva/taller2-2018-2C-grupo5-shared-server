@@ -14,7 +14,8 @@ function getAllServers(res){
             "name" : res.rows[i].nameserver,
             "createdTime" : res.rows[i].createdtime,
             "id" : res.rows[i].server_id,
-            "lastConnection" : res.rows[i].lastconnection
+            "lastConnection" : res.rows[i].lastconnection,
+            "url" : res.rows[i].url
         };
         servers[i]=server;
     }
@@ -29,7 +30,8 @@ function postCreateServer(res,token){
         "name" : res.rows[0].nameserver,
         "createdTime" : res.rows[0].createdtime,
         "id" : res.rows[0].server_id,
-        "lastConnection" : res.rows[0].lastconnection
+        "lastConnection" : res.rows[0].lastconnection,
+        "url" : res.rows[0].url
     };
 
     tokenResp = {
@@ -49,7 +51,8 @@ function getSingleServer(res){
         "name" : res.rows[0].nameserver,
         "createdTime" : res.rows[0].createdtime,
         "id" : res.rows[0].server_id,
-        "lastConnection" : res.rows[0].lastconnection
+        "lastConnection" : res.rows[0].lastconnection,
+        "url" : res.rows[0].url
     };
     response = {metadata: metadataResp, server: server};
     return response;

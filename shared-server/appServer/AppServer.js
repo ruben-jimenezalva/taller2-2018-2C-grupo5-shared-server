@@ -15,7 +15,7 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 
-//--- api used by AppServer
+//--- api used by AppServer and admin
 
 //reset token of app server
 router.post('/:id',TokenController.invalidateToken,db.resetTokenServer);
@@ -26,10 +26,6 @@ router.post('/', db.createServer);
 //update a app server
 router.put('/:id',TokenController.verifyToken,db.updateServer);
 
-
-
-//--- api used by admin
-
 //get all app servers
 router.get('/',TokenController.verifyToken,db.getAllServers);
 
@@ -38,6 +34,10 @@ router.get('/:id',TokenController.verifyToken, db.getSingleServer);
 
 //delete a app server
 router.delete('/:id',TokenController.verifyToken,db.removeTrackings,db.removePayments,TokenController.invalidateToken, db.removeServer);
+
+
+//api used by admin
+router.get('/ping/:url',TokenController.verifyToken, db.getSingleServer);
 
 
 module.exports = router;

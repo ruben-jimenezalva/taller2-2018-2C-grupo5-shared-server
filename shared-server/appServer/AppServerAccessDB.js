@@ -25,8 +25,8 @@ function getAllServers (){
 function createServer (data){
     var nameFunction = arguments.callee.name;
     var client = connect();
-    var values = [data.server_id,data.createdBy,data.name,'NaN',data.jti];
-    var text = 'INSERT INTO server(server_id,createdBy, nameServer,_rev,jti) VALUES($1,$2,$3,$4,$5) RETURNING *';
+    var values = [data.server_id,data.createdBy,data.name,'NaN',data.jti,data.url];
+    var text = 'INSERT INTO server(server_id,createdBy, nameServer,_rev,jti,url) VALUES($1,$2,$3,$4,$5,$6) RETURNING *';
 
     var promise = new Promise(function(reject,resolve){
         client.query(text, values, (error, response) => {
@@ -160,25 +160,25 @@ function resetTokenServer (data){
 }
 
 
-/*
-function updateLastConnection(data){
+
+function updateLastConnection(serverid){
     var nameFunction = arguments.callee.name;
     var client = connect();
-    var response = {};
-    var text = 'UPDATE server SET lastConnection=NOW() WHERE server_id=$1 RETURNNING *';
+    var text = 'UPDATE server SET lastConnection=NOW() WHERE server_id=$1';
 
-    client.query(text,[data.server_id],(error,response)=>{
+    client.query(text,[data.serverid],(error,response)=>{
         if(error){
             logger.error(__filename,nameFunction,error);
             reject(error);
         }else{
-            logger.info(__filename,nameFunction,'update lastConnection succesfully');     
+            logger.info(__filename,nameFunction,'update lastConnection of server: '+data.server_id+' succesfully');     
             resolve(response);    
         }
+        client.end();
     });
     return promise;
 }
-*/
+
 
 
 
@@ -240,6 +240,6 @@ module.exports = {
     resetTokenServer: resetTokenServer,
     removeTrackings:removeTrackings,
     removePayments:removePayments,
- //   updateLastConnection:updateLastConnection,
+    updateLastConnection:updateLastConnection,
     updateJtiServer:updateJtiServer
 };
