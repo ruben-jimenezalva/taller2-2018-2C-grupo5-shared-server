@@ -90,12 +90,14 @@ function updateServer (req, res, next){
     var nameFunction = arguments.callee.name;
     var server_id;
     var name;
+    var url;
     var _rev;
 
     //verify parameters
     _rev = req.body._rev || '';
     name = req.body.name || '';
-    if(_rev == '' || name == ''){
+    url = req.body.url || '';
+    if(_rev == '' && (name == ''|| url == '')){
         logger.warn(__filename,nameFunction,'missing parameteres');
         client.end();
         return res.status(400).json({code: 400, message: 'breach preconditions (missing parameters)'});
@@ -131,9 +133,17 @@ function updateServer (req, res, next){
                 var data_update={};
                 data_update._rev = new_rev;
                 data_update.name = name;
+                data_update.url = url;
                 data_update.server_id = server_id;
 
-                res_update = db.updateServer(data_update);
+                if(name === ""){
+                    res_update = db.updateUrlServer(data_update);
+                }else if(url === ""){
+                    res_update = db.updateNameServer(data_update);
+                }else{
+                    res_update = db.updateNameAndUrlServer(data_update);
+                }
+
                 res_update.then(
                     function(error){
                         logger.error(__filename,nameFunction,error.message);

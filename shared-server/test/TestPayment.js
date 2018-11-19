@@ -13,6 +13,8 @@ const server = APP.listen();
 var createdByData = 'someone';
 var nameData = 'test server payment**++$$-##- 1000+**';
 var nameData2 = 'test server patment**++$$-##- 2000**';
+var dataUrl1 = 'urkadasdasdads';
+var dataUrl2 = 'ent**++$$-##- 2000**';
 var token_server1;
 var token_server2;
 var server_id_1;
@@ -76,7 +78,7 @@ describe('create server',()=>{
     it('should create server with success',(done)=>{
         chai.request(server) 
             .post('/api/servers')
-            .send({createdBy:createdByData, name:nameData})
+            .send({createdBy:createdByData, name:nameData, url:dataUrl1})
             .end(function(err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
@@ -91,7 +93,7 @@ describe('create server',()=>{
     it('should create server with success',(done)=>{
         chai.request(server) 
             .post('/api/servers')
-            .send({createdBy:createdByData, name: nameData2})
+            .send({createdBy:createdByData, name: nameData2, url:dataUrl2})
             .end(function(err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);

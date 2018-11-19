@@ -23,6 +23,8 @@ var id_tracking1_server2;
 var createdByData = 'autor1---**%%%*%1000';
 var nameServer1 = 'server1---**%%%*%';
 var nameServer2 = 'server2---**%%%*%';
+var dataUrl1 = 'urkadasdasdads';
+var dataUrl2 = 'ent**++$$-##- 2000**';
 
 
 
@@ -67,7 +69,7 @@ describe('create server 1', ()=>{
     it('should create server sucessfully', (done)=>{
         chai.request(server) 
             .post('/api/servers')
-            .send({createdBy:createdByData, name:nameServer1})
+            .send({createdBy:createdByData, name:nameServer1, url:dataUrl1})
             .end( function(err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
@@ -83,7 +85,7 @@ describe('create server 2', ()=>{
     it('should create server sucessfully', (done)=>{
         chai.request(server) 
             .post('/api/servers')
-            .send({createdBy:createdByData, name:nameServer2})
+            .send({createdBy:createdByData, name:nameServer2, url:dataUrl2})
             .end( function(err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);

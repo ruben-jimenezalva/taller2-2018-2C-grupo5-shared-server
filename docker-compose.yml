@@ -5,7 +5,7 @@ services:
       - postgres
     build: ./shared-server
     ports:
-      - "8000:8080"
+      - "8080:8080"
     container_name: sharedServer_container
     environment:
       - PGPASSWORD=postgres

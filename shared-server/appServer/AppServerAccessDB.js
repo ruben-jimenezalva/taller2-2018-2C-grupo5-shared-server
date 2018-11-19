@@ -90,9 +90,10 @@ function getSingleServer (data){
 }
 
 
-function updateServer (data){
+function updateNameServer (data){
     var nameFunction = arguments.callee.name;
     var client = connect();
+
     values = [data.name,data._rev,data.server_id];
     text = 'UPDATE server SET nameServer=$1, _rev=$2 WHERE server_id=$3 RETURNING *';
 
@@ -102,7 +103,53 @@ function updateServer (data){
                 logger.error(__filename,nameFunction,error);
                 reject(error);
             } else {
-                logger.info(__filename,nameFunction,'query update server with server_id: '+ data.server_id+ ' was executed successfully');
+                logger.info(__filename,nameFunction,'query update Name server with server_id: '+ data.server_id+ ' was executed successfully');
+                resolve(response);
+            }
+            client.end();
+        })
+    })
+
+    return promise;
+}
+
+function updateUrlServer (data){
+    var nameFunction = arguments.callee.name;
+    var client = connect();
+
+    values = [data.url,data._rev,data.server_id];
+    text = 'UPDATE server SET url=$1, _rev=$2 WHERE server_id=$3 RETURNING *';
+
+    var promise = new Promise(function(reject, resolve){
+        client.query(text, values, (error, response) => {
+            if (error) {
+                logger.error(__filename,nameFunction,error);
+                reject(error);
+            } else {
+                logger.info(__filename,nameFunction,'query update Url server with server_id: '+ data.server_id+ ' was executed successfully');
+                resolve(response);
+            }
+            client.end();
+        })
+    })
+
+    return promise;
+}
+
+function updateNameAndUrlServer (data){
+    var nameFunction = arguments.callee.name;
+    var client = connect();
+
+    values = [data.name,data.url,data._rev,data.server_id];
+    text = 'UPDATE server SET nameServer=$1, url=$2, _rev=$3 WHERE server_id=$4 RETURNING *';
+
+    var promise = new Promise(function(reject, resolve){
+        client.query(text, values, (error, response) => {
+            if (error) {
+                logger.error(__filename,nameFunction,error);
+                reject(error);
+            } else {
+                logger.info(__filename,nameFunction,'query update Name And url server with server_id: '+ data.server_id+ ' was executed successfully');
                 resolve(response);
             }
             client.end();
@@ -165,22 +212,20 @@ function updateLastConnection(serverid){
     var nameFunction = arguments.callee.name;
     var client = connect();
     var text = 'UPDATE server SET lastConnection=NOW() WHERE server_id=$1';
-
-    client.query(text,[data.serverid],(error,response)=>{
-        if(error){
-            logger.error(__filename,nameFunction,error);
-            reject(error);
-        }else{
-            logger.info(__filename,nameFunction,'update lastConnection of server: '+data.server_id+' succesfully');     
-            resolve(response);    
-        }
-        client.end();
+    var promise = new Promise(function(reject, resolve){
+        client.query(text,[serverid],(error,response)=>{
+            if(error){
+                logger.error(__filename,nameFunction,error);
+                reject(error);
+            }else{
+                logger.info(__filename,nameFunction,'update lastConnection of server: '+serverid+' succesfully');     
+                resolve(response);    
+            }
+            client.end();
+        });
     });
     return promise;
 }
-
-
-
 
 
 function removeTrackings (data){
@@ -235,7 +280,9 @@ module.exports = {
     getAllServers: getAllServers,
     createServer: createServer,
     getSingleServer: getSingleServer,
-    updateServer: updateServer,
+    updateNameServer: updateNameServer,
+    updateUrlServer:updateUrlServer,
+    updateNameAndUrlServer:updateNameAndUrlServer,
     removeServer: removeServer,
     resetTokenServer: resetTokenServer,
     removeTrackings:removeTrackings,

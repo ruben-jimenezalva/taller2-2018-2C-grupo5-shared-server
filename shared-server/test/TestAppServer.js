@@ -17,8 +17,9 @@ var newToken;
 var id;
 var _rev;
 var new_rev;
-var dataName = "server&***#$$$$+##++(-)11023*-+*2";
-var dataCreatedBy = "autor&***$$+##++(-)1113*-+*2";
+var dataName = "server&***#$$$$+##++(-)110dasdasd23*d+2";
+var dataCreatedBy = "autor&***$$+##++(-)13add*-+*2";
+var dataUrl = "www.google.com.ar/serachs";
 
 
 describe('TEST',() =>{
@@ -57,11 +58,11 @@ describe('create server',() =>{
 
 
 describe('create server',() =>{
-    it('should get token, register success',(done) =>{
+    it('should create server with success',(done) =>{
         chai.request(server)
             .post('/api/servers')
             .timeout(10000)
-            .send({createdBy:dataCreatedBy, name:dataName})
+            .send({createdBy:dataCreatedBy, name:dataName, url:dataUrl})
             .end( function (err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);

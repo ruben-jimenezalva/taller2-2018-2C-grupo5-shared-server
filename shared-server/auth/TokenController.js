@@ -55,7 +55,7 @@ function verifyToken(req, res, next) {
                                     res.status(500).json({code: 500, message: error.message});
                                 },
                                 function(response){
-                                    logger.error(__filename,nameFunction,error.message);
+                                    logger.info(__filename,nameFunction,"updated last connection server");
                                     next();
                                 }
                             );

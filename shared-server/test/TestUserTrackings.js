@@ -25,6 +25,9 @@ var dataCreated_1='alguien1';
 var dataName_1 = 'server-----1'+ Math.random()*1000000000;
 var dataCreated_2 = 'alguien2';
 var dataName_2 = 'sever-------2'+ Math.random()*1000000000;
+var dataUrl1 = 'urkadasdasdads';
+var dataUrl2 = 'ent**++$$-##- 2000**';
+
 var id_tracking1_server1;
 var id_tracking1_server2;
 var id_payment1_server_1;
@@ -76,7 +79,7 @@ describe('test create server_1', ()=>{
     it('sould create server_1 successfully', (done)=>{
         chai.request(server) 
             .post('/api/servers')
-            .send({createdBy:dataCreated_1, name:dataName_1})
+            .send({createdBy:dataCreated_1, name:dataName_1, url:dataUrl1})
             .end(function(err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
@@ -92,7 +95,7 @@ describe('test create server_2', ()=>{
     it('sould create server_2 successfully', (done)=>{
         chai.request(server) 
             .post('/api/servers')
-            .send({createdBy:dataCreated_2, name:dataName_2})
+            .send({createdBy:dataCreated_2, name:dataName_2, url:dataUrl2})
             .end(function(err,res){
                 expect(res).to.have.status(201);
                 var object = JSON.parse(res.text);
