@@ -74,6 +74,19 @@ describe('create server',() =>{
     });
 });
 
+describe('create server with url already existing',() =>{
+    it('should throw error 500 ',(done) =>{
+        chai.request(server)
+            .post('/api/servers')
+            .timeout(10000)
+            .send({createdBy:"dataCreatedBy123", name:"dataName123", url:dataUrl})
+            .end( function (err,res){
+                expect(res).to.have.status(500);
+                done();
+            });
+    });
+});
+
 
 describe('get all servers with token',() =>{
     it('should get all servers with success',(done) =>{
@@ -186,31 +199,107 @@ describe('update server with field _rev invalid',() =>{
     });
 });
 
+var lastConnectionServer1;
 
-describe('update server with field _rev valid',() =>{
-    it('should update with success',(done) =>{
+describe('update name server with field _rev valid',() =>{
+    var newNameServer ="new name";
+    it('should update name server with success',(done) =>{
         chai.request(server)
             .put('/api/servers/'+id)
-            .send({_rev:_rev, name:"newName"})
+            .send({_rev:_rev, name:newNameServer})
             .set({'Authorization':newToken})
             .end( function (err,res){
                 expect(res).to.have.status(200);
-                var object = JSON.parse(res.text);
-                new_rev = object.server._rev;
+                assert.equal(newNameServer,res.body.server.name);
+                lastConnectionServer1 = res.body.server.lastConnection;
+                new_rev = res.body.server._rev;
                 done();
             });
     });
 });
 
 
-describe('update server with new field _rev valid',() =>{
-    it('should update with success',(done) =>{
+var updatenewUrlServer ="alguna url 1234";
+
+
+describe('update url server with field _rev valid',() =>{
+    it('should update url server with success and change lastConnection server',(done) =>{
         chai.request(server)
             .put('/api/servers/'+id)
-            .send({_rev:new_rev, name:"newName2"})
+            .send({_rev:new_rev, url:updatenewUrlServer})
             .set({'Authorization':newToken})
             .end( function (err,res){
                 expect(res).to.have.status(200);
+                assert.equal(updatenewUrlServer,res.body.server.url);
+                new_rev = res.body.server._rev;
+                assert.notEqual(lastConnectionServer1,res.body.server.lastConnection)
+                done();
+            });
+    });
+});
+
+
+var id_server2;
+var _rev_server2;
+var tokenServer2;
+
+describe('create new server',() =>{
+    it('should create server succesfully',(done) =>{
+        chai.request(server)
+            .post('/api/servers')
+            .timeout(10000)
+            .send({createdBy:"por algun wachin1235467", name:"servertestss", url:"www.algunanrluevaUrl.com"})
+            .end( function (err,res){
+                expect(res).to.have.status(201);
+                id_server2 = res.body.server.server.id;
+                _rev_server2 = res.body.server.server._rev;
+                tokenServer2 = res.body.server.token.token;
+                done();
+            });
+    });
+});
+
+
+describe('update server2 with url that already existing',() =>{
+    it('should throw error 500',(done) =>{
+        chai.request(server)
+            .put('/api/servers/'+id_server2)
+            .send({_rev:_rev_server2, url:updatenewUrlServer})
+            .set({'Authorization':tokenServer2})
+            .end( function (err,res){
+                expect(res).to.have.status(500);
+                done();
+            });
+    });
+});
+
+
+
+describe('delete server2',() =>{
+    it('should delete single server with success',(done) =>{
+        chai.request(server)
+            .delete('/api/servers/'+id_server2)
+            .set({'Authorization':tokenServer2})
+            .end( function (err,res){
+                expect(res).to.have.status(203);
+                done();
+            });
+    });
+});
+
+
+describe('update name and url server with new field _rev valid',() =>{
+    var newNameServer ="newName2";
+    var newUrlServer ="new url2";
+    it('should update  name and url of server with success',(done) =>{
+        chai.request(server)
+            .put('/api/servers/'+id)
+            .send({_rev:new_rev, name:newNameServer, url:newUrlServer})
+            .set({'Authorization':newToken})
+            .end( function (err,res){
+                expect(res).to.have.status(200);
+                assert.equal(newUrlServer,res.body.server.url);
+                assert.equal(newNameServer,res.body.server.name);
                 done();
             });
     });
