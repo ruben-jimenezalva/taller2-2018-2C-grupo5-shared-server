@@ -3,7 +3,6 @@ module.exports = {
     apiVersion: '1.0.0',
     expireTime: 7200000,   //2 hour
     PURCHASE_REALIZED:'compra realizada',
-    PAYMENT_PENDING:'compra realizada',
     PAYMENT_PENDING:'pago pendiente',
     PAYMENT_DECLINED:'pago rechazado',
     PAYMENT_ACCEPTED:'pago aceptado',
