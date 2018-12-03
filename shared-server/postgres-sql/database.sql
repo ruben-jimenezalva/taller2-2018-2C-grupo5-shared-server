@@ -10,7 +10,7 @@ CREATE TABLE server (
     jti VARCHAR(50),
     url VARCHAR(255),
     UNIQUE(url),
-    UNIQUE(nameServer,createdBy),
+    UNIQUE(nameServer),
     PRIMARY KEY (server_id)
 );
 
@@ -48,5 +48,12 @@ CREATE TABLE tracking (
     FOREIGN kEY (server_fk) REFERENCES server(server_id),
     PRIMARY KEY (tracking_id)
 );
+
+
+
+
+
+
+
 
 

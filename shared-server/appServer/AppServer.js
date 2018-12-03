@@ -37,7 +37,8 @@ router.delete('/:id',TokenController.verifyToken,db.removeTrackings,db.removePay
 
 
 //api used by admin
-router.get('/ping/:url',TokenController.verifyToken, db.getSingleServer);
+router.get('/ping/:id',TokenController.verifyToken, db.pingServer);
 
+router.get('/report/:id',TokenController.verifyToken, db.reportServer);
 
 module.exports = router;

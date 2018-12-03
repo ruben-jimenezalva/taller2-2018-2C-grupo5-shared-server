@@ -25,7 +25,8 @@
     "uuid": "^3.3.2",
     "cors": "^2.8.4",
     "nodemon": "^1.18.6",
-    "json-rules-engine":"^2.3.0"
+    "json-rules-engine":"^2.3.0",
+    "request":"^2.88.0"
   },
   "devDependencies": {
     "body-parser": "^1.18.3",

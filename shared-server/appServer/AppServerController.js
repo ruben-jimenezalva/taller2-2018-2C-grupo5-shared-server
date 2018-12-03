@@ -5,7 +5,7 @@ const logger =  require('../others/logger');
 const db = require('./AppServerAccessDB');
 const uuidV1 = require('uuid/v1');
 
-
+const request = require('request');
 
 function getAllServers (req, res, next){
     var nameFunction = arguments.callee.name;
@@ -213,28 +213,6 @@ function resetTokenServer (req, res, next){
 }
 
 
-/*
-function updateLastConnection(req,res,next){
-    var client = req.client;
-    var server_id = req.id;
-    var nameFunction = arguments.callee.name;
-    var text = 'UPDATE server SET lastConnection=NOW() WHERE server_id=$1';
-
-    client.query(text,[server_id],(err,resp)=>{
-        if(err){
-            logger.error(__filename,nameFunction,err.message);
-            res.status(500).json({code:500, message:err.message});
-        }else{
-            logger.info(__filename,nameFunction,'update lastConnection succesfully');     
-            next();       
-        }
-    })
-}
-*/
-
-
-
-
 function removeTrackings (req, res, next){
     var server_id = req.params.id;
     var nameFunction = arguments.callee.name;
@@ -276,11 +254,75 @@ function removePayments (req, res, next){
 }
 
 
-function pingAppServer(req, res, next){
-    var server
+function pingServer(req, res, next){
+    var nameFunction = arguments.callee.name;
+    var data_get={};
+    var server_id = req.params.id;
+    data_get.server_id = server_id;
+
+    db.getSingleServer(data_get)
+    .then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message:error.message});
+        },
+        function(response){
+            if(response.rowCount == 0){
+                logger.warn(__filename,nameFunction,'the server: '+server_id+' not exist');
+                res.status(404).json({code: 404, message:'the server not exist'});
+            }else{
+                logger.info(__filename,nameFunction,'get server: '+server_id+' with success ');
+
+                var url=response.rows[0].url;
+                if(url[url.length-1] === '/'){
+                    url = url + 'admin/ping'
+                }else{
+                    url = url + '/admin/ping'
+                }
+
+                request(url, { json: true }, (err, resp, body) => {
+                    if (err) { res.status(500).send({code:500, menssage:err});}
+                        res.status(200).send(body);
+                });
+            }
+        }
+    );
 }
 
+function reportServer(req, res, next){
+    var nameFunction = arguments.callee.name;
+    var data_get={};
+    var server_id = req.params.id;
+    data_get.server_id = server_id;
 
+    db.getSingleServer(data_get)
+    .then(
+        function(error){
+            logger.error(__filename,nameFunction,error.message);
+            res.status(500).json({code: 500, message:error.message});
+        },
+        function(response){
+            if(response.rowCount == 0){
+                logger.warn(__filename,nameFunction,'the server: '+server_id+' not exist');
+                res.status(404).json({code: 404, message:'the server not exist'});
+            }else{
+                logger.info(__filename,nameFunction,'get server: '+server_id+' with success ');
+                
+                var url=response.rows[0].url;
+                if(url[url.length-1] === '/'){
+                    url = url + 'admin/stats'
+                }else{
+                    url = url + '/admin/stats'
+                }
+
+                request(url, { json: true }, (err, resp, body) => {
+                    if (err) { res.status(500).send({code:500, menssage:err});}
+                        res.status(200).send(body);
+                });
+            }
+        }
+    );
+}
 
 
 module.exports = {
@@ -292,5 +334,6 @@ module.exports = {
     resetTokenServer: resetTokenServer,
     removeTrackings:removeTrackings,
     removePayments:removePayments,
-//    updateLastConnection:updateLastConnection,
+    pingServer,
+    reportServer,
 };
