@@ -2,7 +2,7 @@ const logger =  require('../others/logger');
 const connect = require('../service/Connect');
 const STATUS_ACTIVE = 'ACTIVE';
 const STATUS_INACTIVE = 'INACTIVE';
-
+/*
 function createRecordOfRule (data){
     var nameFunction = arguments.callee.name;
     var client = connect();
@@ -50,7 +50,7 @@ function createRecordOfRule (data){
 
     return promise;
 }
-
+*/
 
 
 /*
@@ -125,7 +125,7 @@ function getAllCurrentRules (){
     
     return promise;
 }*/
-
+/*
 function getAllRules (){
     var client = connect();
     var nameFunction = arguments.callee.name;
@@ -148,12 +148,12 @@ function getAllRules (){
     
     return promise;
 }
-
+*/
 
 module.exports = {
-   createRecordOfRule,
+ //  createRecordOfRule,
  //   getCurrentRule,
   //  getAllCurrentRules,
   //  getRecordsOfRule,
-    getAllRules
+ //   getAllRules
 }

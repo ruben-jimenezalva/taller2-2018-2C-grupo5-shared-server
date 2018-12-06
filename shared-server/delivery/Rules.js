@@ -455,7 +455,7 @@ function saveAllRules(){
     }
 }
 */
-
+/*
 function fillDBWithRules(){
     db.getAllRules()
     .then(
@@ -482,7 +482,7 @@ function fillDBWithRules(){
             }
         }
     );
-}
+}*/
 
 
 
@@ -503,5 +503,5 @@ module.exports={
     ruleSurchargeForScheduleDelivery,
 //    saveAllRules,
     engine,
-    fillDBWithRules,
+//    fillDBWithRules,
 }
