@@ -1,110 +1,162 @@
 "use strict"
 
 var Engine = require('json-rules-engine').Engine;
-
-
+var Rule = require('json-rules-engine').Rule;
 let engine = new Engine();
+require("./Variables");
+let allRules = new Map();
+const logger =  require('../others/logger');
+
+let db = require('./DeliveryAccesDB');
 
 
 /**
- * Adding rules that cancel the delivery
+ * Rules Criticals
  */
-engine.addRule({
-    conditions:{
+
+/**
+ * Rule that cancel the delivery, for points cost or distance minumun
+ */
+let ruleCancelDeliveryPerPointsOrCost = new Rule({
+    conditions: {
         any:[{
             fact: 'user',
             path: 'points',
             operator: 'lessThan',
-            value: '0'
+            value: minimumPointsRequiredToDelivery
         },
         {
             fact: 'cost',
             path: 'value',
             operator: 'lessThanInclusive',
-            value: '50'
-        }]
+            value: minimumCostInPesosRequiredToDelivery
+        },
+        {
+            fact: 'distance',
+            operator: 'lessThan',
+            value: minimumDistanceInKMAllowed
+        }
+    ]
     },
-    event: {  // define the event to fire when the conditions evaluate truthy
-        type: 'minimum-requirements',
+    event: {
+        type: keyMinimumRequirements,
         params: {
           message: 'Delivery can not be made!'
         }
-    }
+    },
+    priority: 5,
+    onSuccess: ()=>{engine.stop();}
+});
+
+
+/**
+ * cancel delivery for duration of the delivery
+ */
+
+let ruleCancelDeliveryPerDurationDelivery = new Rule({
+    conditions:{
+        any:[{
+            fact: 'duration',
+            operator: 'greaterThanInclusive',
+            value: maxDurationPermittedToDelivery
+        }]
+    },
+    event: { 
+        type: keyCancelDeliveryByDuration,
+        params: {
+          message: 'Your delivery is cancel by duration!'
+        }
+    },
+    priority: 5,
+    onSuccess: ()=>{ engine.stop();}
+});
+
+ /**
+ * cancel the delivery for distance exceeds to limit
+ */
+let ruleCancelDeliveryForExccedsDistance = new Rule({
+    conditions:{
+        any:[{
+            fact: 'distance',
+            operator: 'greaterThanInclusive',
+            value: maxDistancePermittedToDelivery
+        }]
+    },
+    event: { 
+        type: keyCancelDeliveryByDistance,
+        params: {
+          message: 'cancel delivery because the distance is very long!'
+        }
+    },
+    priority: 5,
+    onSuccess: ()=>{engine.stop();}
 });
 
 /**
- * Rules and operations for free Delivery
+ * cancel delivery because the delivery is request by application server 
  */
-
-engine.addOperator('haveEmailDomain',(factValue, jsonValue)=>{
-    var expReg = new RegExp(`^.*${jsonValue.toLowerCase()}$`);
-    return expReg.test(factValue.toLowerCase());
+let ruleCancelDeliveryByApplicationServer = new Rule({
+    conditions:{
+        any:[{
+            fact: 'appServerId',
+            operator: 'in',
+            value: serversToCancelDelivery
+        }]
+    },
+    event: { 
+        type: keyCancelDeliveryByAppServer,
+        params: {
+          message: 'Your delivery is cancel by app-Server!'
+        }
+    },
+    priority: 5,
+    onSuccess: ()=>{engine.stop();}
 });
 
+/**
+ * End Rules Criticals
+ */
 
-engine.addRule({
+
+/**
+ * Rule for discount by email domain
+ */
+/**
+ * operator for email domain
+ */
+engine.addOperator('haveEmailDomain',(factValue, jsonValue)=>{
+    return jsonValue.some(element => {
+        var expReg = new RegExp(`^.*${element.toLowerCase()}$`);
+        return expReg.test(factValue.toLowerCase());
+    });
+});
+
+let ruleDeliveryFreeByMail = new Rule({
     conditions:{
         all:[{
             fact: 'user',
             path: 'mail',
             operator: 'haveEmailDomain',
-            value:'@comprame.com'
+            value: allDomainsThatHaveDiscount
         }]
     },
-    event: {  // define the event to fire when the conditions evaluate truthy
-        type: 'free-delivery',
+    event: { 
+        type: keyDiscountEmailDomain,
         params: {
-          message: 'Delivery is Free!'
+            isDiscount : true,
+            message: 'Delivery have discount by the email domain!'
         }
-    }
+    },
+    priority: 2
 });
-
 
 
 /**
- * Discount per first delivery
+ * Rule to disconunt and surcharge per day and schedule
  */
-
-var usersThatUsedDelivery = ['pedro213', 'pablo12s3', 'marcos23'];
-
-/*
-engine.addOperator('firstDelivery',(factValue, jsonValue)=>{
-    return(jsonValue.some(function(element){
-        return element == factValue;
-    }));
-});
-*/
-
-engine.addRule({
-    conditions:{
-        all:[{
-            fact: 'user',
-            path: 'id',
-            operator: 'in',
-            value: usersThatUsedDelivery,
-        }]
-    },
-    event: {  // define the event to fire when the conditions evaluate truthy
-        type: 'first-delivery',
-        params: {
-          message: 'It is your first Delivery  !'
-        }
-    }
-});
-
-
-
 /**
- * Adding rules to disconunt and surcharge per day and schedule
+ * operators to disconunt and surcharge per day and schedule
  */
-
-var daysToDiscount=["tuesday","wednesday"];
-var RangeHoursToDiscount=[15,16];
-var daysToSurCharge=["monday","tuesday","wednesday","thursday","friday"];
-var RangeHoursToSurCharge=[17,19];
-
-const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
-
 engine.addOperator('isInDay',(factValue, jsonValue)=>{
     let dayToDelivery = new Date(factValue).getDay();
     let day = days[dayToDelivery-1];
@@ -120,7 +172,7 @@ engine.addOperator('isInRangeSchedule',(factValue, jsonValue)=>{
 });
 
 
-engine.addRule({
+let ruleDiscountForScheduleDelivery = new Rule({
     conditions:{
         all:[{
             fact: 'start',
@@ -135,17 +187,17 @@ engine.addRule({
             value: RangeHoursToDiscount,
         }]
     },
-    event: {  // define the event to fire when the conditions evaluate truthy
-        type: 'discount-delivery-perDayAndSchedule',
+    event: {  
+        type: keyDiscountByDayAndSchedule,
         params: {
-          message: 'you have discount per day and Schedule!'
+            isDiscount : true,
+            message: 'you have discount per day and Schedule!'
         }
     }
 });
 
 
-
-engine.addRule({
+let ruleSurchargeForScheduleDelivery = new Rule({
     conditions:{
         all:[{
             fact: 'start',
@@ -160,8 +212,8 @@ engine.addRule({
             value: RangeHoursToSurCharge,
         }]
     },
-    event: {  // define the event to fire when the conditions evaluate truthy
-        type: 'surcharge-delivery-perDayAndSchedule',
+    event: { 
+        type: keySurchargeByDayAndSchedule,
         params: {
           message: 'you have surcharge per day and Schedule!'
         }
@@ -169,47 +221,287 @@ engine.addRule({
 });
 
 
-let facts = {
-    cost: {
-        value: 70,
-        currency:"pesos"
+ /**
+ * discount for old user
+ */
+
+let ruleDiscountPerPoints = new Rule({
+    conditions:{
+        any:[{
+            fact: 'user',
+            path: 'points',
+            operator: 'greaterThanInclusive',
+            value: minimunPointsToApplyDiscount
+        }],
     },
-    user: {
-        id:'pablo123',
-        points:9,
-        mail:'abraham@gmal.com'
+    event: { 
+        type: keyDiscountByPoints,
+        params: {
+            isDiscount : true,
+            message: 'You have discount per points!'
+        }
     },
-    start: {
-        address: {
-            street: "calle falsa 123",
-            location: {
-                lat: 120,
-                lon: 1230    
-            }   
+    priority: 2
+});
+
+
+//-------------------------------------------------------------
+
+ /**
+ * discount and Surcharge for paymthod of the user
+ */
+
+let ruleDiscountPerPaymethod = new Rule({
+    conditions:{
+        all:[{
+            fact: 'cost',
+            path: 'method',
+            operator: 'in',
+            value: paymethodsWithDiscount
+        }]
+    },
+    event: { 
+        type: keyDiscountByPaymethod,
+        params: {
+            isDiscount : true,
+            message: 'You are discount per paymethod!'
+        }
+    },
+    priority: 2,
+});
+
+
+let ruleSurchargeForPaymethod = new Rule({
+    conditions:{
+        any:[{
+            fact: 'cost',
+            path: 'method',
+            operator: 'in',
+            value: paymethodsWithSurcharge
+        }]
+    },
+    event: { 
+        type: keySurchargeByPaymehod,
+        params: {
+          message: 'You are Surcharge per paymethod!'
+        }
+    },
+    priority: 2,
+});
+
+ //------------------------------------------------------------
+
+ /**
+ * Surcharge for duration of the delivery
+ */
+
+let ruleSurchargeForDurationDelivery = new Rule({
+    conditions:{
+        any:[{
+            fact: 'duration',
+            operator: 'greaterThanInclusive',
+            value: minDurationToApplySurcharge
+        }]
+    },
+    event: { 
+        type: keySurchargeDurationDelivery,
+        params: {
+          message: 'Your delivery have Surcharge by duration!'
+        }
+    },
+    priority: 2,
+});
+
+
+ /**
+ * Surcharge because distance exceeds to limit
+ */
+
+let ruleSurchargeByExceedsDistance = new Rule({
+    conditions:{
+        any:[{
+            fact: 'distance',
+            operator: 'greaterThanInclusive',
+            value: minDistanceToApplySurcharge
+        }]
+    },
+    event: { 
+        type: keySurchargeDistanceDelivery,
+        params: {
+          message: 'You are Surcharge per distance to long!'
+        }
+    },
+    priority: 2,
+});
+
+
+ //------------------------------------------------------------
+
+
+ /**
+ * discount for application server that make the delivery
+ */
+let ruleDiscountPerApplicactionServer = new Rule({
+    conditions:{
+        any:[{
+            fact: 'appServerId',
+            operator: 'in',
+            value: serversToApplyDiscount
+        }]
+    },
+    event: { 
+        type: keyDiscountByAppServer,
+        params: {
+            isDiscount : true,
+            message: 'You are discount per app-Server!'
+        }
+    },
+    priority: 2,
+});
+
+ /**
+ * Surcharge for application server that make the delivery
+ */
+let ruleSurchargeForAppllicationServer = new Rule({
+    conditions:{
+        any:[{
+            fact: 'appServerId',
+            operator: 'in',
+            value: serversToApplySurcharge
+        }]
+    },
+    event: { 
+        type: keySurchargeByAppServer,
+        params: {
+          message: 'You are Surcharge per app-Server!'
+        }
+    },
+    priority: 2,
+});
+
+
+
+allRules.set("ruleCancelDeliveryByApplicationServer",ruleCancelDeliveryByApplicationServer);
+allRules.set("ruleCancelDeliveryForExccedsDistance",ruleCancelDeliveryForExccedsDistance);
+allRules.set("ruleCancelDeliveryPerDurationDelivery",ruleCancelDeliveryPerDurationDelivery);
+allRules.set("ruleCancelDeliveryPerPointsOrCost",ruleCancelDeliveryPerPointsOrCost);
+allRules.set("ruleDeliveryFreeByMail",ruleDeliveryFreeByMail);
+allRules.set("ruleDiscountForScheduleDelivery",ruleDiscountForScheduleDelivery);
+allRules.set("ruleDiscountPerApplicactionServer",ruleDiscountPerApplicactionServer);
+allRules.set("ruleDiscountPerPaymethod",ruleDiscountPerPaymethod);
+allRules.set("ruleDiscountPerPoints",ruleDiscountPerPoints);
+allRules.set("ruleSurchargeByExceedsDistance",ruleSurchargeByExceedsDistance);
+allRules.set("ruleSurchargeForAppllicationServer",ruleSurchargeForAppllicationServer);
+allRules.set("ruleSurchargeForDurationDelivery",ruleSurchargeForDurationDelivery);
+allRules.set("ruleSurchargeForPaymethod",ruleSurchargeForPaymethod);
+allRules.set("ruleSurchargeForScheduleDelivery",ruleSurchargeForScheduleDelivery);
+
+
+
+/*
+function saveAllRules(){
+
+    var index = 1;
+    db.getAllCurrentRules()
+    .then(
+        function(error){
+            console.log(error);
+            return false;
         },
-        timestamp: 1543424952537 //no dicount or surcharge
-        //timestamp: 1543430925337 //discount
-        //timestamp: 1543436925337 //surcharge
-    },
-    end:{ 
-        address: {
-            street: "avenida siempre viva 123",      
-            location: {
-                lat: 0,        
-                lon: 0 
+        function(response){
+            console.log("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°");
+            let allRulesDB = response.rows;
+
+            for(var [nameRule,rule] of allRules){
+                if(allRulesDB.find( function(element){
+                    if(element.namerule === nameRule){
+                        console.log(element.datarule);
+                        console.log(rule.toJSON());
+                        return element.datarule !== rule.toJSON();
+                        
+                    }
+
+                })){
+                    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+                    console.log("SE TIENE Q ACTUALIZAR LA REGLA");
+                    db.createRecordOfRule({nameRule:nameRule, dataRule: rule.toJSON()})
+                    .then(
+                        function(error){
+                            console.log("ERROR AL ACTUALIZAR LA REGLA");
+                            console.log("----> "+ nameRule);
+                            return false;
+                        },
+                        function(response){
+                            console.log("SE HA ACTUALIZADO LA REGLA");
+                            console.log("----> "+ nameRule);
+                        }
+                    );
+                
+                }else{
+                    console.log("la regla no se actualiza: "+nameRule);
+                }
+                
+                console.log("index"+index);
+                console.log("total"+allRules.size);
+                index++;
+                
             }
-        },   
-        timestamp: 0
+
+        }
+    );
+    if(index >= allRules.size){
+        console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&6");
+        return true;
     }
+}
+*/
+
+function fillDBWithRules(){
+    db.getAllRules()
+    .then(
+        function(error){
+            console.log("error to get all rules");
+        },
+        function(response){
+            if(response.rowCount === 0){
+                for(var [nameRule,rule] of allRules){
+                    db.createRecordOfRule({nameRule:nameRule, dataRule:rule.toJSON()})
+                    .then(
+                        function(error){
+                            console.log(error);
+                            console.log("error to create record of rules");
+                        },
+                        function(response){
+                            console.log("SE HA llenado con reglas");
+                            console.log(rule.toJSON());
+                        }
+                    );
+                }
+            }else{
+                console.log("YA HABIAN REGLAS");
+            }
+        }
+    );
 }
 
 
 
-engine
-  .run(facts)
-  .then(events => { // run() return events with truthy conditions
-    events.map(event =>{
-        console.log(event.params.message);
-    });
-  })
-  .catch(console.log)
+module.exports={
+    ruleCancelDeliveryByApplicationServer,
+    ruleCancelDeliveryForExccedsDistance,
+    ruleCancelDeliveryPerDurationDelivery,
+    ruleCancelDeliveryPerPointsOrCost,
+    ruleDeliveryFreeByMail,
+    ruleDiscountForScheduleDelivery,
+    ruleDiscountPerApplicactionServer,
+    ruleDiscountPerPaymethod,
+    ruleDiscountPerPoints,
+    ruleSurchargeByExceedsDistance,
+    ruleSurchargeForAppllicationServer,
+    ruleSurchargeForDurationDelivery,
+    ruleSurchargeForPaymethod,
+    ruleSurchargeForScheduleDelivery,
+//    saveAllRules,
+    engine,
+    fillDBWithRules,
+}

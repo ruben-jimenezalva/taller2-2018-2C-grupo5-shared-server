@@ -49,6 +49,14 @@ CREATE TABLE tracking (
     PRIMARY KEY (tracking_id)
 );
 
+CREATE TABLE rules (
+    namerule VARCHAR(150) NOT NULL,
+    updatetime TIMESTAMP DEFAULT NOW(),
+    status VARCHAR(50) NOT NULL,
+    datarule VARCHAR(1000) NOT NULL,
+    PRIMARY KEY (namerule,updatetime)
+);
+
 
 
 

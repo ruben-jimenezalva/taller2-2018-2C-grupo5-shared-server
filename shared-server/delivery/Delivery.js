@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var db = require('./DeliveryController');
+var db = require('./DeliveryController');
 var bodyParser = require('body-parser');
 var TokenController = require('../auth/TokenController');
 var morgan = require('morgan');
@@ -17,5 +18,6 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 // deliveries/estimate
 //router.post('/',TokenController.verifyToken, db.calculateDelivery);
 router.post('/', db.calculateDelivery);
+router.put('/', db.updateDataRules);
 
 module.exports = router;

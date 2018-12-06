@@ -1,13 +1,15 @@
 const config = require('../others/Constants');
 
-function mockdelivery(){
+function mockdelivery(TOTALCOST,MESSAGE,ADITIONAL_MESSAGE){
     delivery = {
         "metadata": {
           "version": config.apiVersion
         },
         "cost": {
           "currency": "pesos",
-          "value": 150
+          "value": TOTALCOST,
+          "message": MESSAGE,
+          "aditionals":ADITIONAL_MESSAGE
         }
       }
     return delivery;
