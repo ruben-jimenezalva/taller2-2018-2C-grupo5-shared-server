@@ -27,11 +27,11 @@ $ sudo docker-compose up shared-server
 Testing
 =======================
 Dentro del modulo:
-Para el ambiente de desarrollo utilizamos un override, que permite hacer hotrealod del código.
 
-$ sudo docker-compose build
-$ sudo docker-compose up -d shared-server
-$ sudo docker-compose up test-server
+$ sudo docker-compose up postgres
+$ mv shared-server
+$ sudo npm run cover
+$ sudo docker stop $(sudo docker ps -a -q)
  
 
 Before Deploy
