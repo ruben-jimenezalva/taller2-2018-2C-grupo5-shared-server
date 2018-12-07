@@ -15,7 +15,7 @@ let db = require('./DeliveryAccesDB');
  */
 
 /**
- * Rule that cancel the delivery, for points cost or distance minumun
+ * Rule that cancel the delivery, for points cost or distanceInKm minumun
  */
 let ruleCancelDeliveryPerPointsOrCost = new Rule({
     conditions: {
@@ -32,9 +32,9 @@ let ruleCancelDeliveryPerPointsOrCost = new Rule({
             value: minimumCostInPesosRequiredToDelivery
         },
         {
-            fact: 'distance',
+            fact: 'distanceInKm',
             operator: 'lessThan',
-            value: minimumDistanceInKMAllowed
+            value: minimumDistanceInKmAllowed
         }
     ]
     },
@@ -50,21 +50,21 @@ let ruleCancelDeliveryPerPointsOrCost = new Rule({
 
 
 /**
- * cancel delivery for duration of the delivery
+ * cancel delivery for durationInHours of the delivery
  */
 
-let ruleCancelDeliveryPerDurationDelivery = new Rule({
+let ruleCancelDeliveryPerDurationInHoursDelivery = new Rule({
     conditions:{
         any:[{
-            fact: 'duration',
+            fact: 'durationInHours',
             operator: 'greaterThanInclusive',
-            value: maxDurationPermittedToDelivery
+            value: maxDurationInHoursPermittedToDelivery
         }]
     },
     event: { 
-        type: keyCancelDeliveryByDuration,
+        type: keyCancelDeliveryByDurationInHours,
         params: {
-          message: 'Your delivery is cancel by duration!'
+          message: 'Your delivery is cancel by durationInHours!'
         }
     },
     priority: 5,
@@ -72,20 +72,20 @@ let ruleCancelDeliveryPerDurationDelivery = new Rule({
 });
 
  /**
- * cancel the delivery for distance exceeds to limit
+ * cancel the delivery for distanceInKm exceeds to limit
  */
-let ruleCancelDeliveryForExccedsDistance = new Rule({
+let ruleCancelDeliveryForExccedsDistanceInKm = new Rule({
     conditions:{
         any:[{
-            fact: 'distance',
+            fact: 'distanceInKm',
             operator: 'greaterThanInclusive',
-            value: maxDistancePermittedToDelivery
+            value: maxDistanceInKmPermittedToDelivery
         }]
     },
     event: { 
-        type: keyCancelDeliveryByDistance,
+        type: keyCancelDeliveryByDistanceInKm,
         params: {
-          message: 'cancel delivery because the distance is very long!'
+          message: 'cancel delivery because the distanceInKm is very long!'
         }
     },
     priority: 5,
@@ -292,21 +292,21 @@ let ruleSurchargeForPaymethod = new Rule({
  //------------------------------------------------------------
 
  /**
- * Surcharge for duration of the delivery
+ * Surcharge for durationInHours of the delivery
  */
 
-let ruleSurchargeForDurationDelivery = new Rule({
+let ruleSurchargeForDurationInHoursDelivery = new Rule({
     conditions:{
         any:[{
-            fact: 'duration',
+            fact: 'durationInHours',
             operator: 'greaterThanInclusive',
-            value: minDurationToApplySurcharge
+            value: minDurationInHoursToApplySurcharge
         }]
     },
     event: { 
-        type: keySurchargeDurationDelivery,
+        type: keySurchargeDurationInHoursDelivery,
         params: {
-          message: 'Your delivery have Surcharge by duration!'
+          message: 'Your delivery have Surcharge by durationInHours!'
         }
     },
     priority: 2,
@@ -314,21 +314,21 @@ let ruleSurchargeForDurationDelivery = new Rule({
 
 
  /**
- * Surcharge because distance exceeds to limit
+ * Surcharge because distanceInKm exceeds to limit
  */
 
-let ruleSurchargeByExceedsDistance = new Rule({
+let ruleSurchargeByExceedsDistanceInKm = new Rule({
     conditions:{
         any:[{
-            fact: 'distance',
+            fact: 'distanceInKm',
             operator: 'greaterThanInclusive',
-            value: minDistanceToApplySurcharge
+            value: minDistanceInKmToApplySurcharge
         }]
     },
     event: { 
-        type: keySurchargeDistanceDelivery,
+        type: keySurchargeDistanceInKmDelivery,
         params: {
-          message: 'You are Surcharge per distance to long!'
+          message: 'You are Surcharge per distanceInKm to long!'
         }
     },
     priority: 2,
@@ -382,17 +382,17 @@ let ruleSurchargeForAppllicationServer = new Rule({
 
 
 allRules.set("ruleCancelDeliveryByApplicationServer",ruleCancelDeliveryByApplicationServer);
-allRules.set("ruleCancelDeliveryForExccedsDistance",ruleCancelDeliveryForExccedsDistance);
-allRules.set("ruleCancelDeliveryPerDurationDelivery",ruleCancelDeliveryPerDurationDelivery);
+allRules.set("ruleCancelDeliveryForExccedsDistanceInKm",ruleCancelDeliveryForExccedsDistanceInKm);
+allRules.set("ruleCancelDeliveryPerDurationInHoursDelivery",ruleCancelDeliveryPerDurationInHoursDelivery);
 allRules.set("ruleCancelDeliveryPerPointsOrCost",ruleCancelDeliveryPerPointsOrCost);
 allRules.set("ruleDeliveryFreeByMail",ruleDeliveryFreeByMail);
 allRules.set("ruleDiscountForScheduleDelivery",ruleDiscountForScheduleDelivery);
 allRules.set("ruleDiscountPerApplicactionServer",ruleDiscountPerApplicactionServer);
 allRules.set("ruleDiscountPerPaymethod",ruleDiscountPerPaymethod);
 allRules.set("ruleDiscountPerPoints",ruleDiscountPerPoints);
-allRules.set("ruleSurchargeByExceedsDistance",ruleSurchargeByExceedsDistance);
+allRules.set("ruleSurchargeByExceedsDistanceInKm",ruleSurchargeByExceedsDistanceInKm);
 allRules.set("ruleSurchargeForAppllicationServer",ruleSurchargeForAppllicationServer);
-allRules.set("ruleSurchargeForDurationDelivery",ruleSurchargeForDurationDelivery);
+allRules.set("ruleSurchargeForDurationInHoursDelivery",ruleSurchargeForDurationInHoursDelivery);
 allRules.set("ruleSurchargeForPaymethod",ruleSurchargeForPaymethod);
 allRules.set("ruleSurchargeForScheduleDelivery",ruleSurchargeForScheduleDelivery);
 
@@ -488,17 +488,17 @@ function fillDBWithRules(){
 
 module.exports={
     ruleCancelDeliveryByApplicationServer,
-    ruleCancelDeliveryForExccedsDistance,
-    ruleCancelDeliveryPerDurationDelivery,
+    ruleCancelDeliveryForExccedsDistanceInKm,
+    ruleCancelDeliveryPerDurationInHoursDelivery,
     ruleCancelDeliveryPerPointsOrCost,
     ruleDeliveryFreeByMail,
     ruleDiscountForScheduleDelivery,
     ruleDiscountPerApplicactionServer,
     ruleDiscountPerPaymethod,
     ruleDiscountPerPoints,
-    ruleSurchargeByExceedsDistance,
+    ruleSurchargeByExceedsDistanceInKm,
     ruleSurchargeForAppllicationServer,
-    ruleSurchargeForDurationDelivery,
+    ruleSurchargeForDurationInHoursDelivery,
     ruleSurchargeForPaymethod,
     ruleSurchargeForScheduleDelivery,
 //    saveAllRules,

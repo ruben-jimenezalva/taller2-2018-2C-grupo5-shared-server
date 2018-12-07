@@ -12,21 +12,21 @@ global.acctionsOfTheEvents = new Map();
  //criticals
  global.minimumPointsRequiredToDelivery = obj.minimumPointsRequiredToDelivery;
  global.minimumCostInPesosRequiredToDelivery = obj.minimumCostInPesosRequiredToDelivery;
- global.minimumDistanceInKMAllowed = obj.minimumDistanceInKMAllowed;
+ global.minimumDistanceInKmAllowed = obj.minimumDistanceInKmAllowed;
  global.keyMinimumRequirements = "minimum-requirements";
  global.COST_IN_PESOS_PER_KM = obj.COST_IN_PESOS_PER_KM;
 
  acctionsOfTheEvents.set(keyMinimumRequirements,0);
  
  
- global.maxDistancePermittedToDelivery = obj.maxDistancePermittedToDelivery; //in Km
- global.keyCancelDeliveryByDistance = 'cancel-delivery-by-distance';
- acctionsOfTheEvents.set(keyCancelDeliveryByDistance,0);
+ global.maxDistanceInKmPermittedToDelivery = obj.maxDistanceInKmPermittedToDelivery; //in Km
+ global.keyCancelDeliveryByDistanceInKm = 'cancel-delivery-by-distance';
+ acctionsOfTheEvents.set(keyCancelDeliveryByDistanceInKm,0);
  
  
- global.maxDurationPermittedToDelivery = obj.maxDurationPermittedToDelivery; //in hours
- global.keyCancelDeliveryByDuration = 'cancel-delivery-by-duration';
- acctionsOfTheEvents.set(keyCancelDeliveryByDuration,0);
+ global.maxDurationInHoursPermittedToDelivery = obj.maxDurationInHoursPermittedToDelivery; //in hours
+ global.keyCancelDeliveryByDurationInHours = 'cancel-delivery-by-duration';
+ acctionsOfTheEvents.set(keyCancelDeliveryByDurationInHours,0);
  
  
  global.serversToCancelDelivery = obj.serversToCancelDelivery;
@@ -55,17 +55,17 @@ global.acctionsOfTheEvents = new Map();
   
  
 //distance in km
- global.minDistanceToApplySurcharge = obj.minDistanceToApplySurcharge;
- percentageSurchargePerDistance = obj.percentageSurchargePerDistance;
- global.keySurchargeDistanceDelivery = 'Surcharge-delivery-per-distance';
- acctionsOfTheEvents.set(keySurchargeDistanceDelivery,percentageSurchargePerDistance);
+ global.minDistanceInKmToApplySurcharge = obj.minDistanceInKmToApplySurcharge;
+ percentageSurchargePerDistanceInKm = obj.percentageSurchargePerDistanceInKm;
+ global.keySurchargeDistanceInKmDelivery = 'Surcharge-delivery-per-distance';
+ acctionsOfTheEvents.set(keySurchargeDistanceInKmDelivery,percentageSurchargePerDistanceInKm);
  
  
 //duration in hours
- global.minDurationToApplySurcharge = obj.minDurationToApplySurcharge;
- percentageSurchargePerDuration = obj.percentageSurchargePerDuration;
- global.keySurchargeDurationDelivery = 'Surcharge-delivery-per-duration';
- acctionsOfTheEvents.set(keySurchargeDurationDelivery,percentageSurchargePerDuration);
+ global.minDurationInHoursToApplySurcharge = obj.minDurationInHoursToApplySurcharge;
+ percentageSurchargePerDurationInHours = obj.percentageSurchargePerDurationInHours;
+ global.keySurchargeDurationInHoursDelivery = 'Surcharge-delivery-per-duration';
+ acctionsOfTheEvents.set(keySurchargeDurationInHoursDelivery,percentageSurchargePerDurationInHours);
  
  
 //for days and schedule

@@ -42,8 +42,8 @@ describe('calculate delivery ',() =>{
                             "address": {
                                 "street": "calle falsa 123",
                                 "location": {
-                                    "lat": 120,
-                                    "lon": 1230    
+                                    "lat": 1,
+                                    "lon": 1    
                                 }   
                             },
                             "timestamp": 1543424952537
@@ -52,14 +52,12 @@ describe('calculate delivery ',() =>{
                             "address": {
                                 "street": "avenida siempre viva 123",      
                                 "location": {
-                                    "lat": 0,        
-                                    "lon": 0 
+                                    "lat": 0.5,        
+                                    "lon": 1.1 
                                 }
                             },   
                             "timestamp": 0
-                        },
-                        "distance": 7,
-                        "duration": 12 
+                        }
                     }
                 })
             .end( function (err,res){
@@ -76,12 +74,12 @@ describe('change value of rule delivery ',() =>{
             .send({
                 "minimumPointsRequiredToDelivery": 230,
                 "minimumCostInPesosRequiredToDelivery": 500,
-                "maxDistancePermittedToDelivery": 120,
-                "maxDurationPermittedToDelivery": 120,
-                "minimumDistanceInKMAllowed":2,
-                "COST_IN_PESOS_PER_KM":27,
+                "maxDistanceInKmPermittedToDelivery": 120,
+                "maxDurationInHoursPermittedToDelivery": 120,
+                "minimumDistanceInKmAllowed": 2,
+                "COST_IN_PESOS_PER_KM": 27,
                 "serversToCancelDelivery": [
-                    "server1",
+                    "server1"
                 ],
                 "allDomainsThatHaveDiscount": [
                     "@comprame.com",
@@ -99,10 +97,10 @@ describe('change value of rule delivery ',() =>{
                     "server8"
                 ],
                 "percentageSurchargePerAppServer": 5,
-                "minDistanceToApplySurcharge": "100",
-                "percentageSurchargePerDistance": 5,
-                "minDurationToApplySurcharge": 90,
-                "percentageSurchargePerDuration": 5,
+                "minDistanceInKmToApplySurcharge": "100",
+                "percentageSurchargePerDistanceInKm": 5,
+                "minDurationInHoursToApplySurcharge": 90,
+                "percentageSurchargePerDurationInHours": 5,
                 "daysToDiscount": [
                     "tuesday",
                     "wednesday"
@@ -134,6 +132,19 @@ describe('change value of rule delivery ',() =>{
             })
             .end( function (err,res){
                 expect(res).to.have.status(200);
+                done();
+            });
+    });
+});
+
+
+describe('get all datarules',() =>{
+    it('should change values of rules delivery',(done) =>{
+        chai.request(server) 
+            .get('/api/deliveries/estimate')
+            .end( function (err,res){
+                expect(res).to.have.status(200);
+                assert.exists(res.body.minimumPointsRequiredToDelivery);
                 done();
             });
     });

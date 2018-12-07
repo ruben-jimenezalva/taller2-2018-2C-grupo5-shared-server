@@ -1,9 +1,9 @@
 {
-    "minimumPointsRequiredToDelivery": 230,
-    "minimumCostInPesosRequiredToDelivery": 500,
-    "maxDistancePermittedToDelivery": 120,
-    "maxDurationPermittedToDelivery": 120,
-    "minimumDistanceInKMAllowed": 2,
+    "minimumPointsRequiredToDelivery": 0,
+    "minimumCostInPesosRequiredToDelivery": 20,
+    "maxDistanceInKmPermittedToDelivery": 1200,
+    "maxDurationInHoursPermittedToDelivery": 920,
+    "minimumDistanceInKmAllowed": 1,
     "COST_IN_PESOS_PER_KM": 27,
     "serversToCancelDelivery": [
         "server1"
@@ -24,10 +24,10 @@
         "server8"
     ],
     "percentageSurchargePerAppServer": 5,
-    "minDistanceToApplySurcharge": "100",
-    "percentageSurchargePerDistance": 5,
-    "minDurationToApplySurcharge": 90,
-    "percentageSurchargePerDuration": 5,
+    "minDistanceInKmToApplySurcharge": 150,
+    "percentageSurchargePerDistanceInKm": 5,
+    "minDurationInHoursToApplySurcharge": 90,
+    "percentageSurchargePerDurationInHours": 5,
     "daysToDiscount": [
         "tuesday",
         "wednesday"

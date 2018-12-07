@@ -17,7 +17,8 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 // deliveries/estimate
 //router.post('/',TokenController.verifyToken, db.calculateDelivery);
-router.post('/', db.calculateDelivery);
+router.post('/', db.calculateDistanceDuration, db.calculateDelivery);
 router.put('/', db.updateDataRules);
+router.get('/', db.getDataRules);
 
 module.exports = router;

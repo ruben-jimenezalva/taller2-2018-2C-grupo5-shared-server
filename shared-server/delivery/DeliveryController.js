@@ -3,30 +3,73 @@ const logger =  require('../others/logger');
 var rules = require('./Rules');
 var engine = rules.engine;
 
-function calculateDelivery (req, res, next){
-    var nameFunction = arguments.callee.name;
+
+
+/**
+ * \fn getKilometros().
+ *
+ * \Description: Devuelve la distancia en kilomegtros entre dos puntos dados por su latitud y longitud
+ *
+ * \param (integer) lat1 : Latitud del punto 1
+ * \param (integer) long1 : Longitud del punto 1
+ * \param (integer) lat2 : Latitud del punto 2
+ * \param (integer) long2 : Longitud del punto 2
+ *
+ * \return (integer) Distancia en kilometros
+ *
+ **/
+
+getKilometros = function(lat1,lon1,lat2,lon2){
+    rad = function(x) {return x*Math.PI/180;}
+    var R = 6378.137; //Radio de la tierra en km
+    var dLat = rad( lat2 - lat1 );
+    var dLong = rad( lon2 - lon1 );
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c;
+    return d.toFixed(3); //Retorna tres decimales
+}
+
+
+function calculateDistanceDuration(req, res, next){
     
-    facts = req.body.facts || "";
+    let facts = req.body.facts || "";
     if(facts === ""){
         res.status(400).send({code:400, message:"missing parameters"});
         return 0;
     }
 
+    let latOrigin = facts.start.address.location.lat;
+    let latDestiny = facts.end.address.location.lat;
+    let lonOrigin = facts.start.address.location.lon;
+    let lonDestiny = facts.end.address.location.lon;
+
+    req.body.facts.distanceInKm = getKilometros(latOrigin,lonOrigin,latDestiny,lonDestiny);
+
+    let durationInHours = facts.end.timestamp - facts.start.timestamp;
+    req.body.facts.durationInHours = durationInHours /(60*60); 
+    next();
+}
+
+
+function calculateDelivery (req, res, next){
+    var nameFunction = arguments.callee.name;
+    let facts = req.body.facts;
     /**
      * Adding rules
      */
     engine.addRule(rules.ruleCancelDeliveryByApplicationServer);
-    engine.addRule(rules.ruleCancelDeliveryForExccedsDistance);
-    engine.addRule(rules.ruleCancelDeliveryPerDurationDelivery);
+    engine.addRule(rules.ruleCancelDeliveryForExccedsDistanceInKm);
+    engine.addRule(rules.ruleCancelDeliveryPerDurationInHoursDelivery);
     engine.addRule(rules.ruleCancelDeliveryPerPointsOrCost);
     engine.addRule(rules.ruleDeliveryFreeByMail);
     engine.addRule(rules.ruleDiscountForScheduleDelivery);
     engine.addRule(rules.ruleDiscountPerApplicactionServer);
     engine.addRule(rules.ruleDiscountPerPaymethod);
     engine.addRule(rules.ruleDiscountPerPoints);
-    engine.addRule(rules.ruleSurchargeByExceedsDistance);
+    engine.addRule(rules.ruleSurchargeByExceedsDistanceInKm);
     engine.addRule(rules.ruleSurchargeForAppllicationServer);
-    engine.addRule(rules.ruleSurchargeForDurationDelivery);
+    engine.addRule(rules.ruleSurchargeForDurationInHoursDelivery);
     engine.addRule(rules.ruleSurchargeForPaymethod);
     engine.addRule(rules.ruleSurchargeForScheduleDelivery);
     
@@ -42,7 +85,7 @@ function calculateDelivery (req, res, next){
      /**
       * Calculating cost
       */
-    TOTALCOST = COST_IN_PESOS_PER_KM * facts.distance ;
+    TOTALCOST = COST_IN_PESOS_PER_KM * facts.distanceInKm ;
     console.log("TOTAL => "+ (TOTALCOST + DISCOUNTS_Surcharge));
 
     engine
@@ -55,11 +98,12 @@ function calculateDelivery (req, res, next){
             }
 
             if(event.type === keyMinimumRequirements){
-                TOTALCOST = 0;
+                TOTALCOST = "UNDEFINED";
                 MESSAGE = event.params.message;
             }
             ADITIONAL_MESSAGE += event.params.message+ "  --  ";
             DISCOUNTS_Surcharge = DISCOUNTS_Surcharge + TOTALCOST*percentage/100;
+            console.log("SURCHARGE =>"+TOTALCOST*percentage/100)
         });
         console.log("TOTAL => "+ (TOTALCOST + DISCOUNTS_Surcharge));
         logger.info(__filename,nameFunction,"send response of the delivery");
@@ -70,17 +114,17 @@ function calculateDelivery (req, res, next){
          * Remove rules
          */
         engine.removeRule(rules.ruleCancelDeliveryByApplicationServer);
-        engine.removeRule(rules.ruleCancelDeliveryForExccedsDistance);
-        engine.removeRule(rules.ruleCancelDeliveryPerDurationDelivery);
+        engine.removeRule(rules.ruleCancelDeliveryForExccedsDistanceInKm);
+        engine.removeRule(rules.ruleCancelDeliveryPerDurationInHoursDelivery);
         engine.removeRule(rules.ruleCancelDeliveryPerPointsOrCost);
         engine.removeRule(rules.ruleDeliveryFreeByMail);
         engine.removeRule(rules.ruleDiscountForScheduleDelivery);
         engine.removeRule(rules.ruleDiscountPerApplicactionServer);
         engine.removeRule(rules.ruleDiscountPerPaymethod);
         engine.removeRule(rules.ruleDiscountPerPoints);
-        engine.removeRule(rules.ruleSurchargeByExceedsDistance);
+        engine.removeRule(rules.ruleSurchargeByExceedsDistanceInKm);
         engine.removeRule(rules.ruleSurchargeForAppllicationServer);
-        engine.removeRule(rules.ruleSurchargeForDurationDelivery);
+        engine.removeRule(rules.ruleSurchargeForDurationInHoursDelivery);
         engine.removeRule(rules.ruleSurchargeForPaymethod);
         engine.removeRule(rules.ruleSurchargeForScheduleDelivery);
 
@@ -103,9 +147,9 @@ function updateDataRules (req, res, next){
     dataToUpdate.minimumPointsRequiredToDelivery = req.body.minimumPointsRequiredToDelivery || ""; 
     dataToUpdate.minimumCostInPesosRequiredToDelivery = req.body.minimumCostInPesosRequiredToDelivery || ""; 
 
-    dataToUpdate.maxDistancePermittedToDelivery  = req.body.maxDistancePermittedToDelivery  || ""; 
+    dataToUpdate.maxDistanceInKmPermittedToDelivery  = req.body.maxDistanceInKmPermittedToDelivery  || ""; 
 
-    dataToUpdate.maxDurationPermittedToDelivery  = req.body.maxDurationPermittedToDelivery  || ""; 
+    dataToUpdate.maxDurationInHoursPermittedToDelivery  = req.body.maxDurationInHoursPermittedToDelivery  || ""; 
 
     dataToUpdate.serversToCancelDelivery  = req.body.serversToCancelDelivery  || ""; 
 
@@ -118,11 +162,11 @@ function updateDataRules (req, res, next){
     dataToUpdate.serversToApplySurcharge  = req.body.serversToApplySurcharge  || ""; 
     dataToUpdate.percentageSurchargePerAppServer  = req.body.percentageSurchargePerAppServer  || ""; 
 
-    dataToUpdate.minDistanceToApplySurcharge  = req.body.minDistanceToApplySurcharge  || ""; 
-    dataToUpdate.percentageSurchargePerDistance  = req.body.percentageSurchargePerDistance  || "";
+    dataToUpdate.minDistanceInKmToApplySurcharge  = req.body.minDistanceInKmToApplySurcharge  || ""; 
+    dataToUpdate.percentageSurchargePerDistanceInKm  = req.body.percentageSurchargePerDistanceInKm  || "";
 
-    dataToUpdate.minDurationToApplySurcharge  = req.body.minDurationToApplySurcharge  || ""; 
-    dataToUpdate.percentageSurchargePerDuration  = req.body.percentageSurchargePerDuration  || ""; 
+    dataToUpdate.minDurationInHoursToApplySurcharge  = req.body.minDurationInHoursToApplySurcharge  || ""; 
+    dataToUpdate.percentageSurchargePerDurationInHours  = req.body.percentageSurchargePerDurationInHours  || ""; 
 
     dataToUpdate.daysToDiscount  = req.body.daysToDiscount  || ""; 
     dataToUpdate.InitHourDiscount  = req.body.InitHourDiscount  || ""; 
@@ -157,11 +201,11 @@ function updateDataRules (req, res, next){
     if(dataToUpdate.minimumCostInPesosRequiredToDelivery !== "")
         obj.minimumCostInPesosRequiredToDelivery = dataToUpdate.minimumCostInPesosRequiredToDelivery;
     
-    if (dataToUpdate.maxDistancePermittedToDelivery !== "") 
-        obj.maxDistancePermittedToDelivery = dataToUpdate.maxDistancePermittedToDelivery;
+    if (dataToUpdate.maxDistanceInKmPermittedToDelivery !== "") 
+        obj.maxDistanceInKmPermittedToDelivery = dataToUpdate.maxDistanceInKmPermittedToDelivery;
 
-    if (dataToUpdate.maxDurationPermittedToDelivery !== "") 
-        obj.maxDurationPermittedToDelivery = dataToUpdate.maxDurationPermittedToDelivery;
+    if (dataToUpdate.maxDurationInHoursPermittedToDelivery !== "") 
+        obj.maxDurationInHoursPermittedToDelivery = dataToUpdate.maxDurationInHoursPermittedToDelivery;
 
     if (dataToUpdate.serversToCancelDelivery !== "")
         obj.serversToCancelDelivery = dataToUpdate.serversToCancelDelivery;
@@ -187,18 +231,18 @@ function updateDataRules (req, res, next){
         obj.percentageSurchargePerAppServer = dataToUpdate.percentageSurchargePerAppServer;
         
 
-    if(dataToUpdate.minDistanceToApplySurcharge !== "")
-        obj.minDistanceToApplySurcharge = dataToUpdate.minDistanceToApplySurcharge;
+    if(dataToUpdate.minDistanceInKmToApplySurcharge !== "")
+        obj.minDistanceInKmToApplySurcharge = dataToUpdate.minDistanceInKmToApplySurcharge;
 
-    if(dataToUpdate.percentageSurchargePerDistance !== "")
-        obj.percentageSurchargePerDistance = dataToUpdate.percentageSurchargePerDistance;
+    if(dataToUpdate.percentageSurchargePerDistanceInKm !== "")
+        obj.percentageSurchargePerDistanceInKm = dataToUpdate.percentageSurchargePerDistanceInKm;
 
 
-    if(dataToUpdate.minDurationToApplySurcharge !== "")
-        obj.minDurationToApplySurcharge = dataToUpdate.minDurationToApplySurcharge;
+    if(dataToUpdate.minDurationInHoursToApplySurcharge !== "")
+        obj.minDurationInHoursToApplySurcharge = dataToUpdate.minDurationInHoursToApplySurcharge;
 
-    if(dataToUpdate.percentageSurchargePerDuration !== "")
-        obj.percentageSurchargePerDuration = dataToUpdate.percentageSurchargePerDuration;
+    if(dataToUpdate.percentageSurchargePerDurationInHours !== "")
+        obj.percentageSurchargePerDurationInHours = dataToUpdate.percentageSurchargePerDurationInHours;
 
     if(dataToUpdate.daysToDiscount !== "")
         obj.daysToDiscount = dataToUpdate.daysToDiscount;
@@ -265,10 +309,24 @@ function updateDataRules (req, res, next){
 
 }
 
+function getDataRules(req,res,next){
 
+    var fs = require('fs');
+    fs.readFile(__dirname+'/data.json', 'utf8',function(err,data){
+        if(err){
+            res.status(400).send({code:400, message:"unexpected error"});
+            return(err);
+        }else if(data){
+            res.status(200).send(JSON.parse(data));
+        }
+    });  
+
+}
 
 
 module.exports = {
+    calculateDistanceDuration,
     calculateDelivery:calculateDelivery,
-    updateDataRules
+    updateDataRules,
+    getDataRules
 }
